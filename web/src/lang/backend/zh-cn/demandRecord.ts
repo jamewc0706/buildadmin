@@ -1,0 +1,17 @@
+export default {
+    id: '序号',
+    project_id: '项目组',
+    link: '环节',
+    asset_name: '资产名称',
+    demand_name: '项目组',
+    status: '状态',
+    send_bag_date: '发包日期',
+    receive_bag_date: '收包日期',
+    production_start_date: '制作开始日期',
+    production_end_date: '制作结束日期',
+    estimatd_cost: '预估制作人天',
+    production_person: '制作人员',
+    contact_persion: '网易接口人',
+    create_time: '创建时间',
+    'quick Search Fields': '序号',
+}
