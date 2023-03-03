@@ -38,7 +38,7 @@ const baTable = new baTableClass(
             { type: 'selection', align: 'center', operator: false },
             { label: t('project.id'), prop: 'id', align: 'center', width: 70, operator: 'RANGE', sortable: 'custom' },
             { label: t('project.name'), prop: 'name', width: 120,align: 'center', operatorPlaceholder: t('Fuzzy query'), operator: 'LIKE', sortable: false },
-            { label: t('project.createtime'), width: 120, prop: 'createtime', align: 'center', render: 'datetime', operator: 'RANGE', sortable: 'custom', width: 160, timeFormat: 'yyyy-mm-dd hh:MM:ss' },
+            { label: t('project.createtime'), width: 120, prop: 'createtime', align: 'center', render: 'datetime', operator: 'RANGE', sortable: 'custom', timeFormat: 'yyyy-mm-dd hh:MM:ss' },
             { label: t('operate'), align: 'center', width: 100, render: 'buttons', buttons: optButtons, operator: false },
         ],
         dblClickNotEditColumn: [undefined],

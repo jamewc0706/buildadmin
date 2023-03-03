@@ -26,17 +26,17 @@ export default defineComponent({
         // 输入框的附加属性
         inputAttr: {
             type: Object as PropType<InputAttr>,
-            default: () => {},
+            default: () => { },
         },
         // el-form-item的附加属性
         attr: {
             type: Object as PropType<FormItemAttr>,
-            default: () => {},
+            default: () => { },
         },
         // 额外数据,radio、checkbox的选项等数据
         data: {
             type: Object as PropType<InputData>,
-            default: () => {},
+            default: () => { },
         },
         prop: {
             type: String,
@@ -162,17 +162,19 @@ export default defineComponent({
 <style scoped lang="scss">
 .ba-form-item-label {
     display: inline-block;
+
     .ba-form-item-label-tip {
         padding-left: 6px;
         font-size: 12px;
         color: var(--el-text-color-secondary);
     }
 }
+
 .ba-form-item-not-support {
     line-height: 15px;
 }
+
 .ba-input-item-array :deep(.el-form-item__content) {
     display: block;
     padding-bottom: 32px;
-}
-</style>
+}</style>

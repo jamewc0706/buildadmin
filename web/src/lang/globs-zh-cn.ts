@@ -9,6 +9,7 @@ export default {
     complete: '完成',
     edit: '编辑',
     add: '添加',
+    assign: '指派',
     info: '查看详情',
     'weigh-sort': '拖动以排序',
     delete: '删除',

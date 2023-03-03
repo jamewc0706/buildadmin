@@ -1,0 +1,80 @@
+<template>
+    <!-- 对话框表单 -->
+    <el-dialog class="ba-operate-dialog" :close-on-click-modal="false" :model-value="modalConfig.visible"
+        @close="hideAssignModal" width="50%">
+        <template #header>
+            <div class="title" v-drag="['.ba-operate-dialog', '.el-dialog__header']" v-zoom="'.ba-operate-dialog'">
+                {{ modalConfig.title }}
+            </div>
+        </template>
+        <el-scrollbar v-loading="baTable.form.loading" class="ba-table-form-scrollbar">
+            <div class="ba-operate-form" :class="'ba-' + baTable.form.operate + '-form'"
+                :style="'width: calc(100% - ' + baTable.form.labelWidth! / 2 + 'px)'">
+                <el-form ref="formRef" @submit.prevent="" @keyup.enter="onAssignSubmit()" :model="baTable.form.items"
+                    label-position="right" :label-width="baTable.form.labelWidth + 'px'" :rules="rules">
+                    <FormItem :label="t('demandRecord.production_person')" type="select"
+                        v-model="assignData.production_person" prop="assignData.production_person"
+                        :data="{ content: adminList }"
+                        :placeholder="t('Please select field', { field: t('demandRecord.production_person') })" />
+                    <FormItem :label="t('demandRecord.person_cost')" type="string" v-model="assignData.person_cost"
+                        prop="assignData.person_cost"
+                        :placeholder="t('Please input field', { field: t('demandRecord.person_cost') })" />
+                </el-form>
+            </div>
+        </el-scrollbar>
+        <template #footer>
+            <div :style="'width: calc(100% - ' + baTable.form.labelWidth! / 1.8 + 'px)'">
+                <el-button @click="hideAssignModal">{{ t('Cancel') }}</el-button>
+                <el-button v-blur :loading="baTable.form.submitLoading" @click="onAssignSubmit()" type="primary">
+                    {{ t('Save') }}
+                </el-button>
+            </div>
+        </template>
+    </el-dialog>
+</template>
+
+<script setup lang="ts">
+import { reactive, ref, inject, onMounted } from 'vue'
+import { useI18n } from 'vue-i18n'
+import type baTableClass from '/@/utils/baTable'
+import FormItem from '/@/components/formItem/index.vue'
+import type { ElForm, FormItemRule } from 'element-plus'
+import { buildValidatorData } from '/@/utils/validate'
+const formRef = ref<InstanceType<typeof ElForm>>()
+const baTable = inject('baTable') as baTableClass
+
+const { t } = useI18n()
+interface Props {
+    adminList: anyObj,
+    assignData: anyObj,
+    modalConfig: anyObj,
+    hideAssignModal: Function,
+    onAssignSubmit?: Function
+}
+
+const props = withDefaults(defineProps<Props>(), {
+    adminList: () => {
+        return {}
+    },
+    assignData: () => {
+        return {
+            id: '',
+            person_cost: '',
+            production_person: ''
+        }
+    },
+    modalConfig: () => {
+        return {
+            visible: false,
+            title: '',
+        }
+    },
+})
+
+const rules: Partial<Record<string, FormItemRule[]>> = reactive({
+    person_cost: [buildValidatorData({ name: 'required', title: t('demandRecord.person_cost') })],
+    production_person: [buildValidatorData({ name: 'required', title: t('demandRecord.production_person') })],
+})
+</script>
+
+<style scoped lang="scss"></style>

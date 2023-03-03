@@ -7,3 +7,17 @@ export function getSelect() {
         method: 'get',
     })
 }
+
+
+export function assign(data: anyObj ) {
+    return createAxios(
+        {
+            url: demandRecord + 'assign',
+            method: 'post',
+            data: data,
+        },
+        {
+            showSuccessMessage: true,
+        }
+    )
+}

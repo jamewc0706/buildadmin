@@ -262,6 +262,7 @@ export class baTableApi {
             ['edit', controllerUrl + 'edit'],
             ['del', controllerUrl + 'del'],
             ['sortable', controllerUrl + 'sortable'],
+            ['assign', controllerUrl + 'assign'],
         ])
     }
 
