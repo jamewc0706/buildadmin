@@ -3,10 +3,8 @@
         <el-alert class="ba-table-alert" v-if="baTable.table.remark" :title="baTable.table.remark" type="info" show-icon />
 
         <!-- 表格顶部菜单 -->
-        <TableHeader
-            :buttons="['refresh', 'add', 'edit', 'delete', 'comSearch', 'quickSearch', 'columnDisplay']"
-            :quick-search-placeholder="t('quick Search Placeholder', { fields: t('user.user.User name') + '/' + t('user.user.nickname') })"
-        />
+        <TableHeader :buttons="['refresh', 'add', 'edit', 'delete', 'comSearch', 'quickSearch', 'columnDisplay']"
+            :quick-search-placeholder="t('quick Search Placeholder', { fields: t('user.user.User name') + '/' + t('user.user.nickname') })" />
 
         <!-- 表格 -->
         <!-- 要使用`el-table`组件原有的属性，直接加在Table标签上即可 -->

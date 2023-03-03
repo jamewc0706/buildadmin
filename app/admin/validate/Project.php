@@ -4,7 +4,7 @@ namespace app\admin\validate;
 
 use think\Validate;
 
-class ProjectTeam extends Validate
+class Project extends Validate
 {
     protected $failException = true;
 

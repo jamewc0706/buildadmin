@@ -9,9 +9,9 @@ export default {
     receive_bag_date: 'receive_bag_date',
     production_start_date: 'production_start_date',
     production_end_date: 'production_end_date',
-    estimatd_cost: 'estimatd_cost',
+    cost: 'cost',
     production_person: 'production_person',
-    contact_persion: 'contact_persion',
+    contact_person: 'contact_person',
     create_time: 'create_time',
     'quick Search Fields': 'id',
 }

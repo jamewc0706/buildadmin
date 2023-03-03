@@ -5,14 +5,14 @@ namespace app\admin\controller;
 use app\common\controller\Backend;
 
 /**
- * 项目组管理
+ * 项目管理
  *
  */
-class ProjectTeam extends Backend
+class Project extends Backend
 {
     /**
-     * ProjectTeam模型对象
-     * @var \app\admin\model\ProjectTeam
+     * Project模型对象
+     * @var \app\admin\model\Project
      */
     protected $model = null;
     
@@ -23,7 +23,7 @@ class ProjectTeam extends Backend
     public function initialize()
     {
         parent::initialize();
-        $this->model = new \app\admin\model\ProjectTeam;
+        $this->model = new \app\admin\model\Project;
     }
 
 

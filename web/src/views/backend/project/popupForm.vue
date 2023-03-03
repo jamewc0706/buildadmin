@@ -1,7 +1,7 @@
 <template>
     <!-- 对话框表单 -->
     <el-dialog
-        class="ba-operate-dialog"
+        class="abow_dialog"
         :close-on-click-modal="false"
         :model-value="['add', 'edit'].includes(baTable.form.operate!)"
         @close="baTable.toggleForm"
@@ -28,7 +28,7 @@
                     :label-width="baTable.form.labelWidth + 'px'"
                     :rules="rules"
                 >
-                    <FormItem :label="t('projectTeam.name')" type="string" v-model="baTable.form.items!.name" prop="name" :placeholder="t('Please input field', { field: t('projectTeam.name') })" />
+                    <FormItem :label="t('project.name')" type="string" v-model="baTable.form.items!.name" prop="name" :placeholder="t('Please input field', { field: t('project.name') })" />
                 </el-form>
             </div>
         </el-scrollbar>
@@ -57,8 +57,31 @@ const baTable = inject('baTable') as baTableClass
 const { t } = useI18n()
 
 const rules: Partial<Record<string, FormItemRule[]>> = reactive({
-    createtime: [buildValidatorData({ name: 'date', title: t('projectTeam.createtime') })],
+    createtime: [buildValidatorData({ name: 'date', title: t('project.createtime') })],
 })
 </script>
 
-<style scoped lang="scss"></style>
+<style scoped lang="scss">
+    .abow_dialog {
+    display: flex;
+    justify-content: center;
+    align-items: Center;
+    overflow: hidden;
+    .el-dialog {
+        margin: 0 auto !important;
+        height: 90%;
+        overflow: hidden;
+        .el-dialog__body {
+            position: absolute;
+            left: 0;
+            top: 54px;
+            bottom: 0;
+            right: 0;
+            padding: 0;
+            z-index: 1;
+            overflow: hidden;
+            overflow-y: auto;
+        }
+    }
+}
+</style>
