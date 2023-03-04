@@ -28,7 +28,7 @@
                     :label-width="baTable.form.labelWidth + 'px'"
                     :rules="rules"
                 >
-                    <FormItem :label="t('project.name')" type="string" v-model="baTable.form.items!.name" prop="name" :placeholder="t('Please input field', { field: t('project.name') })" />
+                    <FormItem :label="t('project.project.name')" type="string" v-model="baTable.form.items!.name" prop="name" :placeholder="t('Please input field', { field: t('project.project.name') })" />
                 </el-form>
             </div>
         </el-scrollbar>
@@ -57,7 +57,7 @@ const baTable = inject('baTable') as baTableClass
 const { t } = useI18n()
 
 const rules: Partial<Record<string, FormItemRule[]>> = reactive({
-    createtime: [buildValidatorData({ name: 'date', title: t('project.createtime') })],
+    createtime: [buildValidatorData({ name: 'date', title: t('project.project.createtime') })],
 })
 </script>
 

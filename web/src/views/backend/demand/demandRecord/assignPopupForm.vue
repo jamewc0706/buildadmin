@@ -12,13 +12,19 @@
                 :style="'width: calc(100% - ' + baTable.form.labelWidth! / 2 + 'px)'">
                 <el-form ref="formRef" @submit.prevent="" @keyup.enter="onAssignSubmit()" :model="baTable.form.items"
                     label-position="right" :label-width="baTable.form.labelWidth + 'px'" :rules="rules">
-                    <FormItem :label="t('demandRecord.production_person')" type="select"
+                    <FormItem :label="t('demand.demandRecord.production_person')" type="select"
                         v-model="assignData.production_person" prop="assignData.production_person"
                         :data="{ content: adminList }"
-                        :placeholder="t('Please select field', { field: t('demandRecord.production_person') })" />
-                    <FormItem :label="t('demandRecord.person_cost')" type="string" v-model="assignData.person_cost"
+                        :placeholder="t('Please select field', { field: t('demand.demandRecord.production_person') })" />
+                    <FormItem :label="t('demand.demandRecord.person_cost')" type="string" v-model="assignData.person_cost"
                         prop="assignData.person_cost"
-                        :placeholder="t('Please input field', { field: t('demandRecord.person_cost') })" />
+                        :placeholder="t('Please input field', { field: t('demand.demandRecord.person_cost') })" />
+                    <FormItem :label="t('demand.demandRecord.production_start_date')" type="date"
+                        v-model="assignData.production_start_date" prop="production_start_date"
+                        :placeholder="t('Please select field', { field: t('demand.demandRecord.production_start_date') })" />
+                    <FormItem :label="t('demand.demandRecord.production_end_date')" type="date"
+                        v-model="assignData.production_end_date" prop="production_end_date"
+                        :placeholder="t('Please select field', { field: t('demand.demandRecord.production_end_date') })" />
                 </el-form>
             </div>
         </el-scrollbar>
@@ -60,7 +66,9 @@ const props = withDefaults(defineProps<Props>(), {
         return {
             id: '',
             person_cost: '',
-            production_person: ''
+            production_person: '',
+            production_end_date: '',
+            production_start_date: ''
         }
     },
     modalConfig: () => {
@@ -72,8 +80,8 @@ const props = withDefaults(defineProps<Props>(), {
 })
 
 const rules: Partial<Record<string, FormItemRule[]>> = reactive({
-    person_cost: [buildValidatorData({ name: 'required', title: t('demandRecord.person_cost') })],
-    production_person: [buildValidatorData({ name: 'required', title: t('demandRecord.production_person') })],
+    person_cost: [buildValidatorData({ name: 'required', title: t('demand.demandRecord.person_cost') })],
+    production_person: [buildValidatorData({ name: 'required', title: t('demand.demandRecord.production_person') })],
 })
 </script>
 

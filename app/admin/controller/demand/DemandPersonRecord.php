@@ -1,29 +1,29 @@
 <?php
 
-namespace app\admin\controller;
+namespace app\admin\controller\demand;
 
 use app\common\controller\Backend;
 
 /**
- * 项目管理
+ * 个人需求管理
  *
  */
-class Project extends Backend
+class DemandPersonRecord extends Backend
 {
     /**
-     * Project模型对象
-     * @var \app\admin\model\Project
+     * DemandPersonRecord模型对象
+     * @var \app\admin\model\DemandPersonRecord
      */
     protected $model = null;
     
-    protected $preExcludeFields = ['id', 'createtime'];
+    protected $preExcludeFields = ['id', 'create_time'];
 
     protected $quickSearchField = ['id'];
 
     public function initialize()
     {
         parent::initialize();
-        $this->model = new \app\admin\model\Project;
+        $this->model = new \app\admin\model\DemandPersonRecord;
     }
 
 

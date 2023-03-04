@@ -4,7 +4,7 @@
 
         <!-- 表格顶部菜单 -->
         <TableHeader :buttons="['refresh', 'add', 'edit', 'delete', 'comSearch', 'quickSearch', 'columnDisplay']"
-            :quick-search-placeholder="t('quick Search Placeholder', { fields: t('demandRecord.quick Search Fields') })" />
+            :quick-search-placeholder="t('quick Search Placeholder', { fields: t('demand.demandRecord.quick Search Fields') })" />
 
         <!-- 表格 -->
         <!-- 要使用`el-table`组件原有的属性，直接加在Table标签上即可 -->
@@ -24,7 +24,7 @@ import { ref, provide, onMounted, reactive } from 'vue'
 import baTableClass from '/@/utils/baTable'
 import { defaultOptButtons } from '/@/components/table'
 import { baTableApi } from '/@/api/common'
-import { getSelect, assign } from '/@/api/backend/demandRecord/config'
+import { getSelect, assign } from '/@/api/backend/demand/demandRecord'
 import { useI18n } from 'vue-i18n'
 import PopupForm from './popupForm.vue'
 import AssignPopupForm from './assignPopupForm.vue'
@@ -76,7 +76,9 @@ const state: {
     assignData: {
         id: '',
         person_cost: '',
-        production_person: ''
+        production_person: '',
+        production_start_date: '',
+        production_end_date: '',
     },
     loading: true
 })
@@ -84,38 +86,37 @@ const state: {
 const { t } = useI18n()
 const tableRef = ref()
 const baTable = new baTableClass(
-    new baTableApi('/admin/DemandRecord/'),
+    new baTableApi('/admin/demand.demandRecord/'),
     {
         pk: 'id',
         column: [
             { type: 'selection', align: 'center', operator: false },
-            { label: t('demandRecord.id'), prop: 'id', align: 'center', width: 100, operator: 'RANGE', sortable: 'custom' },
-            { label: t('demandRecord.project_id'), prop: 'project_name', width: 140, align: 'center', render: 'tags', operator: false, sortable: false, replaceValue: {} },
+            { label: t('demand.demandRecord.id'), prop: 'id', align: 'center', width: 100, operator: 'RANGE', sortable: 'custom' },
+            { label: t('demand.demandRecord.project_id'), prop: 'project_name', width: 140, align: 'center', render: 'tags', operator: false, sortable: false, replaceValue: {} },
             {
-                label: t('demandRecord.link'), render: 'tag', prop: 'link', align: 'center', width: 70, operatorPlaceholder: t('Fuzzy query'), operator: '=', sortable: false, replaceValue: {
+                label: t('demand.demandRecord.link'), render: 'tag', prop: 'link', align: 'center', width: 70, operatorPlaceholder: t('Fuzzy query'), operator: '=', sortable: false, replaceValue: {
                     1: '界面',
                     2: '交互',
                     3: '拼接',
                     4: '动效',
                 }
             },
-            { label: t('demandRecord.asset_name'), prop: 'asset_name', width: 90, align: 'center', operatorPlaceholder: t('Fuzzy query'), operator: 'LIKE', sortable: false },
-            { label: t('demandRecord.demand_name'), prop: 'demand_name', width: 90, align: 'center', operatorPlaceholder: t('Fuzzy query'), operator: 'LIKE', sortable: false },
+            { label: t('demand.demandRecord.asset_name'), prop: 'asset_name', width: 90, align: 'center', operatorPlaceholder: t('Fuzzy query'), operator: 'LIKE', sortable: false },
+            { label: t('demand.demandRecord.demand_name'), prop: 'demand_name', width: 90, align: 'center', operatorPlaceholder: t('Fuzzy query'), operator: 'LIKE', sortable: false },
             {
-                label: t('demandRecord.status'), render: 'tag', prop: 'status', align: 'center', width: 70, operator: 'RANGE', sortable: false, replaceValue: {
+                label: t('demand.demandRecord.status'), render: 'tag', prop: 'status', align: 'center', width: 70, operator: 'RANGE', sortable: false, replaceValue: {
                     0: '待开始',
-                    1: '进行中',
+                    1: '已分配',
                     2: '结束',
                 }
             },
-            { label: t('demandRecord.send_bag_date'), prop: 'send_bag_date', align: 'center', operator: '=', sortable: 'custom', width: 160 },
-            { label: t('demandRecord.receive_bag_date'), prop: 'receive_bag_date', align: 'center', operator: '=', sortable: 'custom', width: 160 },
-            { label: t('demandRecord.production_start_date'), prop: 'production_start_date', align: 'center', operator: '=', sortable: 'custom', width: 160 },
-            { label: t('demandRecord.production_end_date'), prop: 'production_end_date', align: 'center', operator: '=', sortable: 'custom', width: 160 },
-            { label: t('demandRecord.cost'), prop: 'cost', align: 'center', width: 120, operatorPlaceholder: t('Fuzzy query'), operator: 'LIKE', sortable: false },
-            { label: t('demandRecord.balance'), prop: 'balance', align: 'center', width: 120, operatorPlaceholder: t('Fuzzy query'), operator: 'LIKE', sortable: false },
-            { label: t('demandRecord.contact_person'), prop: 'contact_person', width: 120, align: 'center', operatorPlaceholder: t('Fuzzy query'), operator: 'LIKE', sortable: false },
-            { label: t('demandRecord.create_time'), prop: 'create_time', align: 'center', render: 'datetime', operator: 'RANGE', sortable: 'custom', width: 160, timeFormat: 'yyyy-mm-dd hh:MM:ss' },
+            { label: t('demand.demandRecord.send_bag_date'), prop: 'send_bag_date', align: 'center', operator: '=', sortable: 'custom', width: 160 },
+            { label: t('demand.demandRecord.receive_bag_date'), prop: 'receive_bag_date', align: 'center', operator: '=', sortable: 'custom', width: 160 },
+            { label: t('demand.demandRecord.production_start_date'), prop: 'production_start_date', align: 'center', operator: '=', sortable: 'custom', width: 160 },
+            { label: t('demand.demandRecord.production_end_date'), prop: 'production_end_date', align: 'center', operator: '=', sortable: 'custom', width: 160 },
+            { label: t('demand.demandRecord.cost'), prop: 'cost', align: 'center', width: 120, operatorPlaceholder: t('Fuzzy query'), operator: 'LIKE', sortable: false },
+            { label: t('demand.demandRecord.contact_person'), prop: 'contact_person', width: 120, align: 'center', operatorPlaceholder: t('Fuzzy query'), operator: 'LIKE', sortable: false },
+            { label: t('demand.demandRecord.create_time'), prop: 'create_time', align: 'center', render: 'datetime', operator: 'RANGE', sortable: 'custom', width: 160, timeFormat: 'yyyy-mm-dd hh:MM:ss' },
             { label: t('operate'), align: 'center', width: 160, render: 'buttons', buttons: optButtons, operator: false },
         ],
         dblClickNotEditColumn: [undefined],
@@ -143,7 +144,6 @@ const handleAssignModal = (row: TableRow) => {
     if (!row) return
     // 数据来自表格数据,未重新请求api,深克隆,不然可能会影响表格
     let rowClone = cloneDeep(row)
-    console.log('rowClone', rowClone)
     state.modalConfig.visible = true
     state.modalConfig.title = '当前指派需求ID:' + rowClone.id
     state.assignData.id = rowClone.id
@@ -165,12 +165,20 @@ const onAssignSubmit = () => {
     state.modalConfig.submitLoading = true;
     assign(state.assignData)
         .then((res) => {
+            console.log('res', res);
             state.modalConfig.submitLoading = false
             hideAssignModal()
+            baTable.mount()
+            baTable.getIndex()?.then(() => {
+                baTable.initSort()
+                baTable.dragSort()
+            })
+        })
+        .catch((err) => {
+            console.log(err)
         })
         .finally(() => {
             state.modalConfig.submitLoading = false
-            hideAssignModal()
         })
 }
 

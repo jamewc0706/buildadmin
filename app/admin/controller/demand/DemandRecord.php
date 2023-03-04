@@ -1,6 +1,6 @@
 <?php
 
-namespace app\admin\controller;
+namespace app\admin\controller\demand;
 
 use think\facade\Db;
 use app\common\controller\Backend;
@@ -95,7 +95,11 @@ class DemandRecord extends Backend
         $project_list = $model->order('id desc')->select()->toArray();
         $project_list = array_column($project_list, null, 'id');
         foreach ($list as &$l) {
+            $count = Db::name('demand_person_record')->where('project_id',$l['id'])->where('status',0)->count();
             $l['project_name'] = isset($project_list[$l['id']]) ? $project_list[$l['id']]['name'] : "-";
+            if($count > 0){
+                $l['status'] = 1;
+            }
         }
 
         $this->success('', [
@@ -120,10 +124,10 @@ class DemandRecord extends Backend
             if ($this->dataLimit && $this->dataLimitFieldAutoFill) {
                 $data[$this->dataLimitField] = $this->auth->id;
             }
-
-            //  添加余下人天
-            if (isset($data['cost'])) {
-                $data['balance'] = $data['cost'];
+            //处理制造结束时间
+            if(isset($data['production_end_date']) && $data['production_end_date']!=''){
+                $production_end_date = strtotime($data['production_end_date']) + (60 * 60 * 24) - 1;
+                $data['production_end_date'] = date('Y-m-d H:i:s',$production_end_date);
             }
 
             $result = false;
@@ -179,11 +183,6 @@ class DemandRecord extends Backend
             $data   = $this->excludeFields($data);
             $result = false;
 
-            //  编辑余下人天
-            if (isset($data['cost'])) {
-                $data['balance'] = $data['cost'];
-            }
-
             Db::startTrans();
             try {
                 // 模型验证
@@ -220,47 +219,98 @@ class DemandRecord extends Backend
     {
         if ($this->request->isPost()) {
             $data = $this->request->post();
+            $model = new \app\admin\model\DemandPersonRecord;
             if (!$data) {
                 $this->error(__('Parameter %s can not be empty', ['']));
             }
-                            $this->success(__('Added successfully'));
+            $insertData = [
+                $this->dataLimitField => $this->auth->id,
+                'project_id' => $data['id'],
+                'production_end_date' => $data['production_end_date']." 23:59:59",
+                'production_start_date' => $data['production_start_date']. " 00:00:00",
+                'production_person' => $data['production_person'],
+                'cost' => $data['person_cost'],
+                'status' => 0
+            ];
 
-            // $data = $this->excludeFields($data);
-            // if ($this->dataLimit && $this->dataLimitFieldAutoFill) {
-            //     $data[$this->dataLimitField] = $this->auth->id;
-            // }
+            $err_msg = $this->check($insertData);
+            if(!empty($err_msg)){
+                $this->error($err_msg);
+            }
 
-            // //  添加余下人天
-            // if (isset($data['cost'])) {
-            //     $data['balance'] = $data['cost'];
-            // }
-
-            // $result = false;
-            // Db::startTrans();
-            // try {
-            //     // 模型验证
-            //     if ($this->modelValidate) {
-            //         $validate = str_replace("\\model\\", "\\validate\\", get_class($this->model));
-            //         if (class_exists($validate)) {
-            //             $validate = new $validate;
-            //             if ($this->modelSceneValidate) $validate->scene('add');
-            //             $validate->check($data);
-            //         }
-            //     }
-            //     $result = $this->model->save($data);
-            //     Db::commit();
-            // } catch (ValidateException | PDOException | Exception $e) {
-            //     Db::rollback();
-            //     $this->error($e->getMessage());
-            // }
-            // if ($result !== false) {
-            //     $this->success(__('Added successfully'));
-            // } else {
-            //     $this->error(__('No rows were added'));
-            // }
+            $insertData[$this->dataLimitField] = $this->auth->id;
+            $result = false;
+            Db::startTrans();
+            try {
+                // 模型验证
+                if ($this->modelValidate) {
+                    $validate = str_replace("\\model\\", "\\validate\\", get_class($this->model));
+                    if (class_exists($validate)) {
+                        $validate = new $validate;
+                        if ($this->modelSceneValidate) $validate->scene('add');
+                        $validate->check($data);
+                    }
+                }
+                $result = $model->save($insertData);
+                Db::commit();
+            } catch (ValidateException | PDOException | Exception $e) {
+                Db::rollback();
+                $this->error($e->getMessage());
+            }
+            if ($result !== false) {
+                $this->success(__('Added successfully'));
+            } else {
+                $this->error(__('No rows were added'));
+            }
         }
 
         $this->error(__('Parameter error'));
     }
 
+    public function check($data){
+        $err_msg = "";
+        $person_total_cost = Db::name('demand_person_record')->where('project_id',$data['project_id'])->where('status',0)->sum('cost');
+        $remand_info = Db::name('demand_record')->where('id',$data['project_id'])->find();
+        $person_total_cost += $data['cost']; //全部人的人天
+        $total_cost = $remand_info['cost'];  //需求的人天
+        $person_start_date = strtotime($data['production_start_date']); //个人指派开始时间
+        $person_end_date = strtotime($data['production_end_date']);  //个人指派结束时间
+        $production_start_date = strtotime($remand_info['production_start_date']);
+        $production_end_date = strtotime($remand_info['production_end_date']);
+
+        //未分配时间
+        if($production_start_date == '' || $production_end_date == ''){
+            return "指派失败!超过该需求未分配时间";
+        }
+
+        //未分配人天
+        if($total_cost == 0){
+            return "指派失败!超过该需求未分配人天";
+        }
+
+        // 超过限制的人天
+        if ($person_total_cost > $total_cost){
+            return "指派失败!超过该需求人天[{$total_cost}人天]";
+        }
+        // var_dump(date('Y-m-d H:i:s',$person_start_date));
+        // var_dump(date('Y-m-d H:i:s',$person_end_date));
+        // var_dump(date('Y-m-d H:i:s',$production_start_date));
+        // var_dump(date('Y-m-d H:i:s',$production_end_date));
+        // var_dump($person_start_date < $production_start_date);
+        // var_dump($person_start_date > $production_end_date);
+        // var_dump($person_end_date < $production_start_date);
+        // var_dump($person_end_date > $production_end_date);
+        //判断是否在需求范围内
+        if($person_start_date < $production_start_date || $person_start_date > $production_end_date || $person_end_date < $production_start_date || $person_end_date > $production_end_date){
+            return "指派失败!指派时间应该在{$remand_info['production_start_date']}-{$remand_info['production_end_date']}内";
+        }
+
+        $day = ceil(($person_end_date - $person_start_date) / (60 * 60 * 24)); 
+
+        if($data['cost'] > $day){
+            return "指派失败!指派人天:{$data['cost']},指派时间范围换算人天:{$day}";
+        }
+
+        return  '';
+    }
 }
