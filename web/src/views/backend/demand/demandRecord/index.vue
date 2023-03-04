@@ -56,7 +56,7 @@ const state: {
     assignData: {
         id: string,
         person_cost: string,
-        production_person: string
+        producer_id: string
     },
     modalConfig: {
         visible: boolean,
@@ -76,7 +76,7 @@ const state: {
     assignData: {
         id: '',
         person_cost: '',
-        production_person: '',
+        producer_id: '',
         production_start_date: '',
         production_end_date: '',
     },
@@ -156,7 +156,7 @@ const hideAssignModal = () => {
     state.assignData = {
         id: '',
         person_cost: '',
-        production_person: ''
+        producer_id: ''
     }
 }
 

@@ -228,7 +228,7 @@ class DemandRecord extends Backend
                 'project_id' => $data['id'],
                 'production_end_date' => $data['production_end_date']." 23:59:59",
                 'production_start_date' => $data['production_start_date']. " 00:00:00",
-                'production_person' => $data['production_person'],
+                'producer_id' => $data['producer_id'],
                 'cost' => $data['person_cost'],
                 'status' => 0
             ];

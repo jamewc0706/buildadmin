@@ -10,7 +10,7 @@ export default {
     production_start_date: 'production_start_date',
     production_end_date: 'production_end_date',
     cost: 'cost',
-    production_person: 'production_person',
+    producer_id: 'producer_id',
     contact_person: 'contact_person',
     create_time: 'create_time',
     'quick Search Fields': 'id',
