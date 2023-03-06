@@ -50,6 +50,7 @@ class DemandRecord extends Backend
      * 若需重写查看、编辑、删除等方法，请复制 @see \app\admin\library\traits\Backend 中对应的方法至此进行重写
      */
 
+    // 获取项目以及员工下拉框
     public function getSelect()
     {
         $model = new \app\admin\model\Project;
@@ -69,6 +70,50 @@ class DemandRecord extends Backend
             'project_list' => $project_list,
             'admin_list' => $admin_list,
         ]);
+    }
+
+    // 获取日期下拉框
+    public function getDateSelect()
+    {
+        $date_select_list = [];
+        $id = $this->request->get('id');
+        if (!$id) {
+            $this->success('', [
+                'date_select_list' => $date_select_list,
+            ]);
+        }
+
+        $date_arr = $this->getDateRangeArr($id);
+        $date_map = [
+            0 => '星期天',
+            1 => '星期一',
+            2 => '星期二',
+            3 => '星期三',
+            4 => '星期四',
+            5 => '星期五',
+            6 => '星期六',
+        ];
+
+        if ($date_arr) {
+            foreach ($date_arr as $item) {
+                $date_select_list[$item] = $item . "-" . $date_map[date('w', strtotime($item))];
+            }
+        }
+
+        $this->success('', [
+            'date_select_list' => $date_select_list,
+        ]);
+    }
+
+    public function getDateRangeArr($id){
+        $date_arr = [];
+        $demand_info = $this->model->where('id', $id)->find();
+        if ($demand_info['production_start_date'] != '' && $demand_info['production_end_date'] != '') {
+            $start_date = date('Y-m-d', strtotime($demand_info['production_start_date']));
+            $end_date = date('Y-m-d', strtotime($demand_info['production_end_date']));
+            $date_arr = $this->createDateRangeArray($start_date, $end_date);
+        }
+        return $date_arr;
     }
 
     /**
@@ -95,9 +140,9 @@ class DemandRecord extends Backend
         $project_list = $model->order('id desc')->select()->toArray();
         $project_list = array_column($project_list, null, 'id');
         foreach ($list as &$l) {
-            $count = Db::name('demand_person_record')->where('project_id',$l['id'])->where('status',0)->count();
+            $count = Db::name('demand_person_record')->where('demand_id', $l['id'])->where('status', 0)->count();
             $l['project_name'] = isset($project_list[$l['id']]) ? $project_list[$l['id']]['name'] : "-";
-            if($count > 0){
+            if ($count > 0) {
                 $l['status'] = 1;
             }
         }
@@ -125,9 +170,9 @@ class DemandRecord extends Backend
                 $data[$this->dataLimitField] = $this->auth->id;
             }
             //处理制造结束时间
-            if(isset($data['production_end_date']) && $data['production_end_date']!=''){
+            if (isset($data['production_end_date']) && $data['production_end_date'] != '') {
                 $production_end_date = strtotime($data['production_end_date']) + (60 * 60 * 24) - 1;
-                $data['production_end_date'] = date('Y-m-d H:i:s',$production_end_date);
+                $data['production_end_date'] = date('Y-m-d H:i:s', $production_end_date);
             }
 
             $result = false;
@@ -212,7 +257,7 @@ class DemandRecord extends Backend
         ]);
     }
 
-        /**
+    /**
      * 指派
      */
     public function assign()
@@ -223,22 +268,16 @@ class DemandRecord extends Backend
             if (!$data) {
                 $this->error(__('Parameter %s can not be empty', ['']));
             }
-            $insertData = [
-                $this->dataLimitField => $this->auth->id,
-                'project_id' => $data['id'],
-                'production_end_date' => $data['production_end_date']." 23:59:59",
-                'production_start_date' => $data['production_start_date']. " 00:00:00",
-                'producer_id' => $data['producer_id'],
-                'cost' => $data['person_cost'],
-                'status' => 0
-            ];
 
-            $err_msg = $this->check($insertData);
-            if(!empty($err_msg)){
+            // 组装参数
+            $assembleData = $this->assembleData($data);
+
+            // 校验参数
+            $err_msg = $this->check($assembleData,$data);
+            if (!empty($err_msg)) {
                 $this->error($err_msg);
             }
 
-            $insertData[$this->dataLimitField] = $this->auth->id;
             $result = false;
             Db::startTrans();
             try {
@@ -251,7 +290,12 @@ class DemandRecord extends Backend
                         $validate->check($data);
                     }
                 }
-                $result = $model->save($insertData);
+                $result = $model->save($assembleData);
+                $json_ext = json_decode($assembleData['json_ext'],true) ?? [];
+                $items = json_decode($json_ext['items'],true) ?? [];   
+                //批量添加
+                Db::table('person_demand_schedule')->insertAll($items);
+
                 Db::commit();
             } catch (ValidateException | PDOException | Exception $e) {
                 Db::rollback();
@@ -267,50 +311,170 @@ class DemandRecord extends Backend
         $this->error(__('Parameter error'));
     }
 
-    public function check($data){
-        $err_msg = "";
-        $person_total_cost = Db::name('demand_person_record')->where('project_id',$data['project_id'])->where('status',0)->sum('cost');
-        $remand_info = Db::name('demand_record')->where('id',$data['project_id'])->find();
-        $person_total_cost += $data['cost']; //全部人的人天
-        $total_cost = $remand_info['cost'];  //需求的人天
-        $person_start_date = strtotime($data['production_start_date']); //个人指派开始时间
-        $person_end_date = strtotime($data['production_end_date']);  //个人指派结束时间
-        $production_start_date = strtotime($remand_info['production_start_date']);
-        $production_end_date = strtotime($remand_info['production_end_date']);
+    //组装
+    public function assembleData($data)
+    {
+        $demand_id = $data['id'];
+        $producer_id = $data['producer_id'];
+        $date_list = $data['date_list'];
+        $extra_content = trim($data['extra_content']) ?? '';
+        $mark_arr = $info = $items = [];
 
-        //未分配时间
-        if($production_start_date == '' || $production_end_date == ''){
-            return "指派失败!超过该需求未分配时间";
+        if (!empty($extra_content)) {
+            // 中文逗号处理
+            $extra_content = trim($extra_content);
+            $arr = explode("\n", $extra_content);
+            foreach($arr as $mark){
+                if(!empty($mark)){
+                    $item = explode('=',$mark);
+                    $date = $item[0] ?? '';
+                    $cost = $item[1] ?? 0;
+                    $mark_arr[$date] = $cost;
+
+                    if(!in_array($date,$date_list)){
+                        $this->error(__("日期:{$date}不存在可分配日期内"));
+                    }
+
+                }
+            }
         }
 
-        //未分配人天
-        if($total_cost == 0){
-            return "指派失败!超过该需求未分配人天";
+        if(count($mark_arr) > count($date_list)){
+            $this->error(__('备注日期个数超出选择的分配日期的个数'));
         }
 
-        // 超过限制的人天
-        if ($person_total_cost > $total_cost){
-            return "指派失败!超过该需求人天[{$total_cost}人天]";
-        }
-        // var_dump(date('Y-m-d H:i:s',$person_start_date));
-        // var_dump(date('Y-m-d H:i:s',$person_end_date));
-        // var_dump(date('Y-m-d H:i:s',$production_start_date));
-        // var_dump(date('Y-m-d H:i:s',$production_end_date));
-        // var_dump($person_start_date < $production_start_date);
-        // var_dump($person_start_date > $production_end_date);
-        // var_dump($person_end_date < $production_start_date);
-        // var_dump($person_end_date > $production_end_date);
-        //判断是否在需求范围内
-        if($person_start_date < $production_start_date || $person_start_date > $production_end_date || $person_end_date < $production_start_date || $person_end_date > $production_end_date){
-            return "指派失败!指派时间应该在{$remand_info['production_start_date']}-{$remand_info['production_end_date']}内";
+        foreach ($date_list as  $date) {
+            //每天的工时默认是1
+            $cost = $type = $actual_cost = 1;
+            // 如果特殊标注存在 工时用特殊标注的
+            if(isset($mark_arr[$date])){
+                $cost = $mark_arr[$date];
+                $actual_cost = $mark_arr[$date];
+
+                //非加班情况下  不允许人天超1天
+                if($cost > 1 && $cost != 2){
+                    $this->error(__('非加班情况,分配的人天不能超过最大值'));
+                }
+
+                //加班
+                if($cost == 2){
+                    $type = 2;
+                }
+            }
+
+            $item = [
+                'demand_id' => $demand_id,
+                'producer_id' => $producer_id,
+                'date' => $date,
+                'cost' => $cost,
+                'actual_cost' => $actual_cost,
+                'status' => 1,
+                'type' => $type,
+                'admin_id' => $this->auth->id,
+                'operator' => $this->auth->username
+            ];
+
+            $items[] = $item;
         }
 
-        $day = ceil(($person_end_date - $person_start_date) / (60 * 60 * 24)); 
+        $json_ext = json_encode([
+            'date_list' => $date_list,
+            'extra_content' => $extra_content,
+            'items' => json_encode($items)
+        ]);
 
-        if($data['cost'] > $day){
-            return "指派失败!指派人天:{$data['cost']},指派时间范围换算人天:{$day}";
+        $info = [
+            'demand_id' => $demand_id, //需求id
+            'status' => 1, //状态
+            'admin_id' => $this->auth->id, //添加人id
+            'producer_id' => $producer_id, //制作人id
+            'create_time' => time(),  //创建时间,
+            'json_ext' => $json_ext
+        ];
+
+        return $info;
+    }
+
+    public function check($assembleData, $data)
+    {
+        if(empty($data['date_list'])){
+            return  "排期时间不能为空";
+        }
+
+        if(empty($data['producer_id'])){
+            return  "制作人不能为空";
+        }
+
+        if(empty($data['id'])){
+            return "需求id不能为空";
+        }
+
+        $json_ext = json_decode($assembleData['json_ext'],true) ?? [];
+        $items = json_decode($json_ext['items'],true) ?? [];
+        $add_cost = $demand_all_cost = $person_demand_cost = 0;
+        $demand_info = Db::name('demand_record')->where('id', $assembleData['demand_id'])->find();
+        //检查
+        foreach($items as $item){
+            if($item['cost'] <= 0 ){
+                return "日期:{$item['date']}-{$item['cost']} 工时分配错误";
+            }
+
+            //校验排期冲突
+            $cost_info = $this->getUserPlanCostByDate($item['date'],$data['producer_id']);
+            if ( ($cost_info['all_cost'] + $item['cost']) > 1 ) {
+                return "日期:{$item['date']} 已超出个人当天可安排的人天";
+            }
+
+            // 校验时间范围
+            $date_range = $this->getDateRangeArr($item['demand_id']);
+            if(!in_array($item['date'],$date_range)){
+                return "日期:{$item['date']} 不存在可分配范围内";
+            }
+
+            $add_cost += $item['actual_cost'];
+        }
+
+        $demand_cost_info = $this->getDemandCost($assembleData['demand_id']);
+        if ( ($add_cost + $demand_cost_info['all_actual_cost']) > $demand_info['cost'] ) {
+            return "已超出该需求{$demand_info['demand_name']}的总人天";
         }
 
         return  '';
+    }
+
+    //获取该日期下该制造人的人天
+    public function getUserPlanCostByDate($date,$producer_id){
+        $all_actual_cost = $all_cost = 0;
+        $info = Db::name('person_demand_schedule')->where('date', $date)->where('producer_id',$producer_id)->select();
+        if($info){
+            foreach($info as $val){
+                $cost = $val['cost'];
+                $actual_cost = $val['actual_cost'];
+                $all_cost += $cost;
+                $all_actual_cost += $actual_cost;
+            }
+        }
+        return [
+            'all_actual_cost' => $all_actual_cost,
+            'all_cost' => $all_cost
+        ];
+    }
+
+    //获取该需求下的人天
+    public function getDemandCost($demand_id){
+        $all_actual_cost = $all_cost = 0;
+        $info = Db::name('person_demand_schedule')->where('demand_id',$demand_id)->select();
+        if($info){
+            foreach($info as $val){
+                $cost = $val['cost'];
+                $actual_cost = $val['actual_cost'];
+                $all_cost += $cost;
+                $all_actual_cost += $actual_cost;
+            }
+        }
+        return [
+            'all_actual_cost' => $all_actual_cost,
+            'all_cost' => $all_cost
+        ];
     }
 }

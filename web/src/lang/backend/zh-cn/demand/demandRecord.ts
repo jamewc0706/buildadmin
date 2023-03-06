@@ -9,6 +9,8 @@ export default {
     receive_bag_date: '收包日期',
     production_start_date: '制作开始日期',
     production_end_date: '制作结束日期',
+    extra_content: '备注',
+    date_list: '排期时间',
     cost: '总制作人天',
     producer_id: '制作人员',
     person_cost: '指派工时',

@@ -10,27 +10,24 @@
         <el-scrollbar v-loading="baTable.form.loading" class="ba-table-form-scrollbar">
             <div class="ba-operate-form" :class="'ba-' + baTable.form.operate + '-form'"
                 :style="'width: calc(100% - ' + baTable.form.labelWidth! / 2 + 'px)'">
-                <el-form ref="formRef" @submit.prevent="" @keyup.enter="onAssignSubmit()" :model="baTable.form.items"
+                <el-form ref="formRef" @submit.prevent="" :model="assignData"
                     label-position="right" :label-width="baTable.form.labelWidth + 'px'" :rules="rules">
                     <FormItem :label="t('demand.demandRecord.producer_id')" type="select" v-model="assignData.producer_id"
-                        prop="assignData.producer_id" :data="{ content: adminList }"
+                        prop="producer_id" :data="{ content: adminList }"
                         :placeholder="t('Please select field', { field: t('demand.demandRecord.producer_id') })" />
-                    <FormItem :label="t('demand.demandRecord.person_cost')" type="string" v-model="assignData.person_cost"
-                        prop="assignData.person_cost"
-                        :placeholder="t('Please input field', { field: t('demand.demandRecord.person_cost') })" />
-                    <FormItem :label="t('demand.demandRecord.production_start_date')" type="date"
-                        v-model="assignData.production_start_date" prop="production_start_date"
-                        :placeholder="t('Please select field', { field: t('demand.demandRecord.production_start_date') })" />
-                    <FormItem :label="t('demand.demandRecord.production_end_date')" type="date"
-                        v-model="assignData.production_end_date" prop="production_end_date"
-                        :placeholder="t('Please select field', { field: t('demand.demandRecord.production_end_date') })" />
+                    <FormItem :label="t('demand.demandRecord.date_list')" type="selects" prop="date_list"
+                        v-model="assignData.date_list" :data="{
+                            content: dateSelectList
+                        }" />
+                    <FormItem :label="t('demand.demandRecord.extra_content')" prop="extra_content" type="textarea"
+                        :input-attr="{ rows: 6 }" v-model="assignData.extra_content" />
                 </el-form>
             </div>
         </el-scrollbar>
         <template #footer>
             <div :style="'width: calc(100% - ' + baTable.form.labelWidth! / 1.8 + 'px)'">
                 <el-button @click="hideAssignModal">{{ t('Cancel') }}</el-button>
-                <el-button v-blur :loading="baTable.form.submitLoading" @click="onAssignSubmit()" type="primary">
+                <el-button v-blur :loading="baTable.form.submitLoading" @click="onAssignSubmit(formRef)" type="primary">
                     {{ t('Save') }}
                 </el-button>
             </div>
@@ -53,6 +50,7 @@ interface Props {
     adminList: anyObj,
     assignData: anyObj,
     modalConfig: anyObj,
+    dateSelectList: anyObj,
     hideAssignModal: Function,
     onAssignSubmit?: Function
 }
@@ -61,13 +59,15 @@ const props = withDefaults(defineProps<Props>(), {
     adminList: () => {
         return {}
     },
+    dateSelectList: () => {
+        return {}
+    },
     assignData: () => {
         return {
             id: '',
-            person_cost: '',
             producer_id: '',
-            production_end_date: '',
-            production_start_date: ''
+            date_list: [],
+            extra_content: ""
         }
     },
     modalConfig: () => {
@@ -79,10 +79,8 @@ const props = withDefaults(defineProps<Props>(), {
 })
 
 const rules: Partial<Record<string, FormItemRule[]>> = reactive({
-    person_cost: [buildValidatorData({ name: 'required', title: t('demand.demandRecord.person_cost') })],
     producer_id: [buildValidatorData({ name: 'required', title: t('demand.demandRecord.producer_id') })],
-    production_end_date: [buildValidatorData({ name: 'required', title: t('demand.demandRecord.production_end_date') })],
-    production_start_date: [buildValidatorData({ name: 'required', title: t('demand.demandRecord.production_start_date') })],
+    date_list: [buildValidatorData({ name: 'required', title: t('demand.demandRecord.date_list') })],
 })
 </script>
 

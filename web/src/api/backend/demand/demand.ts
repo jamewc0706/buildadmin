@@ -1,9 +1,23 @@
 import createAxios from '/@/utils/axios'
-import { demandRecord } from '/@/api/controllerUrls'
+import { demandRecord, demandCalendar } from '/@/api/controllerUrls'
 
 export function getSelect() {
     return createAxios({
         url: demandRecord + 'getSelect',
+        method: 'get',
+    })
+}
+
+export function getDateSelect(id:any) {
+    return createAxios({
+        url: demandRecord + 'getDateSelect?id='+ id,
+        method: 'get',
+    })
+}
+
+export function getPersonDemand() {
+    return createAxios({
+        url: demandCalendar + 'getPersonDemand',
         method: 'get',
     })
 }

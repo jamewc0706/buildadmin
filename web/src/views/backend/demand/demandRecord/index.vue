@@ -15,7 +15,7 @@
 
         <!-- 指派表单 -->
         <AssignPopupForm :assignData="state.assignData" :modalConfig="state.modalConfig" :admin-list="state.adminList"
-            :onAssignSubmit="onAssignSubmit" :hideAssignModal="hideAssignModal" />
+            :onAssignSubmit="onAssignSubmit" :hideAssignModal="hideAssignModal" :dateSelectList="state.dateSelectList" />
     </div>
 </template>
 
@@ -24,13 +24,14 @@ import { ref, provide, onMounted, reactive } from 'vue'
 import baTableClass from '/@/utils/baTable'
 import { defaultOptButtons } from '/@/components/table'
 import { baTableApi } from '/@/api/common'
-import { getSelect, assign } from '/@/api/backend/demand/demandRecord'
+import { getSelect, assign, getDateSelect } from '/@/api/backend/demand/demand'
 import { useI18n } from 'vue-i18n'
 import PopupForm from './popupForm.vue'
 import AssignPopupForm from './assignPopupForm.vue'
 import Table from '/@/components/table/index.vue'
 import TableHeader from '/@/components/table/header/index.vue'
 import { concat, cloneDeep } from 'lodash-es'
+import { ElForm } from 'element-plus'
 
 let optButtons: OptButton[] = [
     {
@@ -53,10 +54,12 @@ const state: {
     state: {}
     projectList: anyObj,
     adminList: anyObj,
+    dateSelectList: string[],
     assignData: {
         id: string,
-        person_cost: string,
-        producer_id: string
+        producer_id: string,
+        date_list: string[],
+        extra_content: ''
     },
     modalConfig: {
         visible: boolean,
@@ -75,12 +78,12 @@ const state: {
     },
     assignData: {
         id: '',
-        person_cost: '',
         producer_id: '',
-        production_start_date: '',
-        production_end_date: '',
+        date_list: [],
+        extra_content: ""
     },
-    loading: true
+    loading: true,
+    dateSelectList: {}
 })
 
 const { t } = useI18n()
@@ -130,8 +133,8 @@ const baTable = new baTableClass(
 const getAllSelect = () => {
     getSelect()
         .then((res) => {
-            state.projectList = res.data.project_list
-            state.adminList = res.data.admin_list
+            state.projectList = res.data.project_list || {}
+            state.adminList = res.data.admin_list || {}
             state.loading = false
         })
         .catch(() => {
@@ -139,47 +142,72 @@ const getAllSelect = () => {
         })
 }
 
-/** 关闭指派弹窗 */
+/**  打开指派弹窗*/
 const handleAssignModal = (row: TableRow) => {
     if (!row) return
     // 数据来自表格数据,未重新请求api,深克隆,不然可能会影响表格
     let rowClone = cloneDeep(row)
-    state.modalConfig.visible = true
-    state.modalConfig.title = '当前指派需求ID:' + rowClone.id
-    state.assignData.id = rowClone.id
+
+    getDateSelect(
+        rowClone.id
+    )
+        .then((res) => {
+            state.dateSelectList = res.data.date_select_list || {}
+            state.loading = false
+            state.modalConfig.visible = true
+            state.modalConfig.title = '当前指派需求ID:' + rowClone.id
+            state.assignData.id = rowClone.id
+        })
+        .catch(() => {
+            state.loading = false
+        })
 }
 
-/** 打开指派弹窗 */
+/** 关闭指派弹窗 */
 const hideAssignModal = () => {
     state.modalConfig.visible = false
     state.modalConfig.title = ''
     state.assignData = {
         id: '',
-        person_cost: '',
-        producer_id: ''
+        producer_id: '',
+        date_list: [],
+        extra_content: ''
     }
 }
 
-const onAssignSubmit = () => {
+const onAssignSubmit = (formEl: InstanceType<typeof ElForm> | undefined = undefined) => {
     console.log('指派需求参数', state.assignData)
-    state.modalConfig.submitLoading = true;
-    assign(state.assignData)
-        .then((res) => {
-            console.log('res', res);
-            state.modalConfig.submitLoading = false
-            hideAssignModal()
-            baTable.mount()
-            baTable.getIndex()?.then(() => {
-                baTable.initSort()
-                baTable.dragSort()
+
+    // 表单验证通过后执行的api请求操作
+    const submitCallback = () => {
+        state.modalConfig.submitLoading = true;
+        assign(state.assignData)
+            .then((res) => {
+                console.log('res', res);
+                state.modalConfig.submitLoading = false
+                hideAssignModal()
+                baTable.mount()
+                baTable.getIndex()?.then(() => {
+                    baTable.initSort()
+                    baTable.dragSort()
+                })
             })
-        })
-        .catch((err) => {
-            console.log(err)
-        })
-        .finally(() => {
-            state.modalConfig.submitLoading = false
-        })
+            .catch((err) => {
+                console.log(err)
+            })
+            .finally(() => {
+                state.modalConfig.submitLoading = false
+            })
+    }
+    if (!formEl) return
+    console.log(formEl)
+    formEl.validate((valid: any) => {
+        console.log(valid)
+        if (valid) {
+            submitCallback()
+            // 验证通过
+        }
+    })
 }
 
 provide('baTable', baTable)
