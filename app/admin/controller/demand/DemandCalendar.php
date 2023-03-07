@@ -30,12 +30,55 @@ class DemandCalendar extends Backend
     public function getPersonDemand()
     {
         $calendar_data = [];
+        $demand_contents = [];
+        // {
+        //     "day": '2023-03-07',
+        //     "demand_content": [
+        //         {
+        //             "type": "info",
+        //             "desc": '待开始',
+        //             "demand": [
+        //                 '需求1',
+        //                 '需求2',
+        //             ]
+        //         },
+        //         {
+        //             "type": "warning",
+        //             "desc": '进行中',
+        //             "demand": [
+        //                 '需求1',
+        //                 '需求2',
+        //             ]
+        //         },
+        //         {
+        //             "type": "success",
+        //             "desc": '已完成',
+        //             "demand": [
+        //                 '需求1',
+        //                 '需求2',
+        //             ]
+        //         }, {
+        //             "type": "danger",
+        //             "desc": '已延期',
+        //             "demand": [
+        //                 '需求1',
+        //                 '需求2',
+        //             ]
+        //         }
+        //     ]
+        // }
         $info = Db::name('person_demand_schedule')->where('producer_id',$this->auth->id)->select();
         $demand_info = Db::name('demand_record')->select()->toArray();
         $demand_info = array_column($demand_info,null,'id');
         foreach ($info as $item) {
             $demand_content[$item['date']][] =  isset($demand_info[$item['demand_id']]) ? $demand_info[$item['demand_id']]['demand_name'] . "-人天:{$item['cost']}" : '未知需求名';
         }
+        
+
+
+
+
+
 
         foreach($info as $val) {
             $calendar_data[] = [

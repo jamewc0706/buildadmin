@@ -10,7 +10,14 @@
                     <el-col class="center">
                         <el-row>
                             <el-col v-for="(val, idx) in item.demand_content" :key="idx">
-                                <span>{{ val }}</span>
+                                <el-tag :key="idx" :type="val.type" class="mx-1 tag-w center" effect="dark">
+                                    {{ val.desc }}
+                                </el-tag>
+                                <el-ul v-for="(value, tag) in val.demand" class="text">
+                                    <el-li>
+                                        {{ value }}
+                                    </el-li>
+                                </el-ul>
                             </el-col>
                         </el-row>
                     </el-col>
@@ -28,6 +35,42 @@ const state = reactive({
     loading: true,
     //测试数据
     calendarData: [
+        {
+            "day": '2023-03-07',
+            "demand_content": [
+                {
+                    "type": "info",
+                    "desc": '待开始',
+                    "demand": [
+                        '需求1',
+                        '需求2',
+                    ]
+                },
+                {
+                    "type": "",
+                    "desc": '进行中',
+                    "demand": [
+                        '需求1',
+                        '需求2',
+                    ]
+                },
+                {
+                    "type": "success",
+                    "desc": '已完成',
+                    "demand": [
+                        '需求1',
+                        '需求2',
+                    ]
+                }, {
+                    "type": "danger",
+                    "desc": '已延期',
+                    "demand": [
+                        '需求1',
+                        '需求2',
+                    ]
+                }
+            ]
+        }
     ],
 });
 
@@ -35,7 +78,7 @@ const state = reactive({
 const getIndex = () => {
     getPersonDemand()
         .then((res) => {
-            state.calendarData = res.data.calendar_data
+            // state.calendarData = res.data.calendar_data
             state.loading = false
         })
         .catch(() => {
@@ -86,7 +129,8 @@ onMounted(() => {
 :deep .el-calendar-table .el-calendar-day {
     box-sizing: border-box;
     padding: 5px;
-    height: 180px;
+    height: 100%;
+    color: #000;
     width: auto;
 }
 
@@ -100,6 +144,19 @@ onMounted(() => {
     justify-content: center;
 }
 
+.tag-w {
+    width: 80px;
+    margin-bottom: 5px;
+    margin-top: 5px;
+    justify-content: center;
+    align-items: center;
+}
+
+.text {
+    padding: 2px 0px 2px 10px;
+    align-items: center;
+    display: flex;
+}
 </style>
   
   
