@@ -35,10 +35,15 @@ const baTable = new baTableClass(
         column: [
             { type: 'selection', align: 'center', operator: false },
             { label: t('demand.demandPersonRecord.id'), prop: 'id', align: 'center', width: 70, operator: 'RANGE', sortable: 'custom' },
-            { label: t('demand.demandPersonRecord.project_id'), prop: 'project_id', align: 'center', operatorPlaceholder: t('Fuzzy query'), operator: 'LIKE' },
-            { label: t('demand.demandPersonRecord.production_start_date'), prop: 'production_start_date', align: 'center', operator: '=', sortable: 'custom', width: 160 },
-            { label: t('demand.demandPersonRecord.production_end_date'), prop: 'production_end_date', align: 'center', operator: '=', sortable: 'custom', width: 160 },
-            { label: t('demand.demandPersonRecord.cost'), prop: 'cost', align: 'center', operatorPlaceholder: t('Fuzzy query'), operator: 'LIKE', sortable: false },
+            { label: t('demand.demandPersonRecord.demand_id'), prop: 'demand_name', align: 'center', operatorPlaceholder: t('Fuzzy query'), operator: 'LIKE' },
+            {
+                label: t('demand.demandPersonRecord.status'), render: 'tag', prop: 'status', align: 'center', width: 70, operator: 'RANGE', sortable: false, replaceValue: {
+                    1: '待开始',
+                    2: '进行中',
+                    3: '完成',
+                    4: '延期',
+                }
+            },
             { label: t('demand.demandPersonRecord.create_time'), prop: 'create_time', align: 'center', render: 'datetime', operator: 'RANGE', sortable: 'custom', width: 160, timeFormat: 'yyyy-mm-dd hh:MM:ss' },
             { label: t('operate'), align: 'center', width: 100, render: 'buttons', buttons: optButtons, operator: false },
         ],

@@ -1,7 +1,6 @@
 <template>
     <!-- 对话框表单 -->
-    <el-dialog
-class="ba-operate-dialog" :close-on-click-modal="false"
+    <el-dialog class="ba-operate-dialog" :close-on-click-modal="false"
         :model-value="['add', 'edit'].includes(baTable.form.operate!)" @close="baTable.toggleForm" width="50%">
         <template #header>
             <div class="title" v-drag="['.ba-operate-dialog', '.el-dialog__header']" v-zoom="'.ba-operate-dialog'">
@@ -9,20 +8,19 @@ class="ba-operate-dialog" :close-on-click-modal="false"
             </div>
         </template>
         <el-scrollbar v-loading="baTable.form.loading" class="ba-table-form-scrollbar">
-            <div
-class="ba-operate-form" :class="'ba-' + baTable.form.operate + '-form'"
+            <div class="ba-operate-form" :class="'ba-' + baTable.form.operate + '-form'"
                 :style="'width: calc(100% - ' + baTable.form.labelWidth! / 2 + 'px)'">
-                <el-form
-v-if="!baTable.form.loading" ref="formRef" @submit.prevent=""
+                <el-form v-if="!baTable.form.loading" ref="formRef" @submit.prevent=""
                     @keyup.enter="baTable.onSubmit(formRef)" :model="baTable.form.items" label-position="right"
                     :label-width="baTable.form.labelWidth + 'px'" :rules="rules">
-                    <FormItem
-:label="t('demand.demandRecord.project_id')" type="select" v-model="baTable.form.items!.project_id"
-                        prop="project_id" :data="{ content: projectList }"
+                    <FormItem :label="t('demand.demandRecord.project_id')" type="select"
+                        v-model="baTable.form.items!.project_id" prop="project_id" :data="{ content: projectList }"
                         :placeholder="t('Please select field', { field: t('demand.demandRecord.project_id') })" />
-                    <FormItem
-:label="t('demand.demandRecord.link')" type="select" v-model="baTable.form.items!.link" prop="link"
-                        :data="{
+                    <FormItem :label="t('demand.demandRecord.department_id')" type="select"
+                        v-model="baTable.form.items!.department_id" prop="department_id" :data="{ content: {} }"
+                        :placeholder="t('Please select field', { field: t('demand.demandRecord.department_id') })" />
+                    <FormItem :label="t('demand.demandRecord.link')" type="select" v-model="baTable.form.items!.link"
+                        prop="link" :data="{
                             content: {
                                 1: '界面',
                                 2: '交互',
@@ -30,34 +28,27 @@ v-if="!baTable.form.loading" ref="formRef" @submit.prevent=""
                                 4: '动效',
                             }
                         }" :placeholder="t('Please input field', { field: t('demand.demandRecord.link') })" />
-                    <FormItem
-:label="t('demand.demandRecord.asset_name')" type="string" v-model="baTable.form.items!.asset_name"
-                        prop="asset_name" :placeholder="t('Please input field', { field: t('demand.demandRecord.asset_name') })" />
-                    <FormItem
-:label="t('demand.demandRecord.demand_name')" type="string" v-model="baTable.form.items!.demand_name"
-                        prop="demand_name"
+                    <FormItem :label="t('demand.demandRecord.asset_name')" type="string"
+                        v-model="baTable.form.items!.asset_name" prop="asset_name"
+                        :placeholder="t('Please input field', { field: t('demand.demandRecord.asset_name') })" />
+                    <FormItem :label="t('demand.demandRecord.demand_name')" type="string"
+                        v-model="baTable.form.items!.demand_name" prop="demand_name"
                         :placeholder="t('Please input field', { field: t('demand.demandRecord.demand_name') })" />
-                    <FormItem
-:label="t('demand.demandRecord.send_bag_date')" type="date"
+                    <FormItem :label="t('demand.demandRecord.send_bag_date')" type="date"
                         v-model="baTable.form.items!.send_bag_date" prop="send_bag_date"
                         :placeholder="t('Please select field', { field: t('demand.demandRecord.send_bag_date') })" />
-                    <FormItem
-:label="t('demand.demandRecord.receive_bag_date')" type="date"
+                    <FormItem :label="t('demand.demandRecord.receive_bag_date')" type="date"
                         v-model="baTable.form.items!.receive_bag_date" prop="receive_bag_date"
                         :placeholder="t('Please select field', { field: t('demand.demandRecord.receive_bag_date') })" />
-                    <FormItem
-:label="t('demand.demandRecord.production_start_date')" type="date"
+                    <FormItem :label="t('demand.demandRecord.production_start_date')" type="date"
                         v-model="baTable.form.items!.production_start_date" prop="production_start_date"
                         :placeholder="t('Please select field', { field: t('demand.demandRecord.production_start_date') })" />
-                    <FormItem
-:label="t('demand.demandRecord.production_end_date')" type="date"
+                    <FormItem :label="t('demand.demandRecord.production_end_date')" type="date"
                         v-model="baTable.form.items!.production_end_date" prop="production_end_date"
                         :placeholder="t('Please select field', { field: t('demand.demandRecord.production_end_date') })" />
-                    <FormItem
-:label="t('demand.demandRecord.cost')" type="string" v-model="baTable.form.items!.cost" prop="cost"
-                        :placeholder="t('Please input field', { field: t('demand.demandRecord.cost') })" />
-                    <FormItem
-:label="t('demand.demandRecord.contact_person')" type="string"
+                    <FormItem :label="t('demand.demandRecord.cost')" type="string" v-model="baTable.form.items!.cost"
+                        prop="cost" :placeholder="t('Please input field', { field: t('demand.demandRecord.cost') })" />
+                    <FormItem :label="t('demand.demandRecord.contact_person')" type="string"
                         v-model="baTable.form.items!.contact_person" prop="contact_person"
                         :placeholder="t('Please input field', { field: t('demand.demandRecord.contact_person') })" />
                 </el-form>

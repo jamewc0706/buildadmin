@@ -16,6 +16,10 @@
         <!-- 指派表单 -->
         <AssignPopupForm :assignData="state.assignData" :modalConfig="state.modalConfig" :admin-list="state.adminList"
             :onAssignSubmit="onAssignSubmit" :hideAssignModal="hideAssignModal" :dateSelectList="state.dateSelectList" />
+
+        <!-- 指派表单 -->
+        <LogPopupForm :loading="state.loading" :logModalConfig="state.logModalConfig" :log="state.log"
+            :hideLogModal="hideLogModal" />
     </div>
 </template>
 
@@ -28,6 +32,7 @@ import { getSelect, assign, getDateSelect } from '/@/api/backend/demand/demand'
 import { useI18n } from 'vue-i18n'
 import PopupForm from './popupForm.vue'
 import AssignPopupForm from './assignPopupForm.vue'
+import LogPopupForm from './logPopupForm.vue'
 import Table from '/@/components/table/index.vue'
 import TableHeader from '/@/components/table/header/index.vue'
 import { concat, cloneDeep } from 'lodash-es'
@@ -37,7 +42,7 @@ let optButtons: OptButton[] = [
     {
         render: 'tipButton',
         name: 'assign',
-        title: 'assign',
+        title: '指派',
         text: '',
         type: 'primary',
         icon: 'fa fa-send',
@@ -47,6 +52,19 @@ let optButtons: OptButton[] = [
             handleAssignModal(row)
         },
     },
+    {
+        render: 'tipButton',
+        name: 'info',
+        title: '操作记录',
+        text: '',
+        type: 'primary',
+        icon: 'fa fa-search-plus',
+        class: 'table-row-edit',
+        disabledTip: false,
+        click: (row: TableRow) => {
+            handleLogModal(row)
+        },
+    },
 ]
 
 optButtons = concat(optButtons, defaultOptButtons(['edit', 'delete']))
@@ -54,6 +72,7 @@ const state: {
     state: {}
     projectList: anyObj,
     adminList: anyObj,
+    log: anyObj[],
     dateSelectList: string[],
     assignData: {
         id: string,
@@ -62,6 +81,11 @@ const state: {
         extra_content: ''
     },
     modalConfig: {
+        visible: boolean,
+        title: string,
+        submitLoading: boolean
+    },
+    logModalConfig: {
         visible: boolean,
         title: string,
         submitLoading: boolean
@@ -76,6 +100,11 @@ const state: {
         title: '', // 弹窗标题
         submitLoading: false
     },
+    logModalConfig: {
+        visible: false, // 弹窗是否显示
+        title: '', // 弹窗标题
+        submitLoading: false
+    },
     assignData: {
         id: '',
         producer_id: '',
@@ -83,7 +112,41 @@ const state: {
         extra_content: ""
     },
     loading: true,
-    dateSelectList: {}
+    dateSelectList: {},
+    log: [
+        {
+            'createtime': '1678178376',
+            'title': '测试1'
+        },
+        {
+            'createtime': '1678178399',
+            'title': '测试12'
+        },
+        {
+            'createtime': '1678178399',
+            'title': '测试12'
+        },
+        {
+            'createtime': '1678178399',
+            'title': '测试12'
+        },
+        {
+            'createtime': '1678178399',
+            'title': '测试12'
+        },
+        {
+            'createtime': '1678178399',
+            'title': '测试12'
+        },
+        {
+            'createtime': '1678178399',
+            'title': '测试12'
+        },
+        {
+            'createtime': '1678178399',
+            'title': '测试12'
+        },
+    ]
 })
 
 const { t } = useI18n()
@@ -96,6 +159,7 @@ const baTable = new baTableClass(
             { type: 'selection', align: 'center', operator: false },
             { label: t('demand.demandRecord.id'), prop: 'id', align: 'center', width: 100, operator: 'RANGE', sortable: 'custom' },
             { label: t('demand.demandRecord.project_id'), prop: 'project_name', width: 140, align: 'center', render: 'tags', operator: false, sortable: false, replaceValue: {} },
+            { label: t('demand.demandRecord.department_id'), prop: 'department_id', width: 140, align: 'center', render: 'tags', operator: false, sortable: false, replaceValue: {} },
             {
                 label: t('demand.demandRecord.link'), render: 'tag', prop: 'link', align: 'center', width: 70, operatorPlaceholder: t('Fuzzy query'), operator: '=', sortable: false, replaceValue: {
                     1: '界面',
@@ -108,9 +172,9 @@ const baTable = new baTableClass(
             { label: t('demand.demandRecord.demand_name'), prop: 'demand_name', width: 90, align: 'center', operatorPlaceholder: t('Fuzzy query'), operator: 'LIKE', sortable: false },
             {
                 label: t('demand.demandRecord.status'), render: 'tag', prop: 'status', align: 'center', width: 70, operator: 'RANGE', sortable: false, replaceValue: {
-                    0: '待开始',
-                    1: '已分配',
-                    2: '结束',
+                    1: '待开始',
+                    2: '已分配',
+                    3: '结束',
                 }
             },
             { label: t('demand.demandRecord.send_bag_date'), prop: 'send_bag_date', align: 'center', operator: '=', sortable: 'custom', width: 160 },
@@ -140,6 +204,31 @@ const getAllSelect = () => {
         .catch(() => {
             state.loading = false
         })
+}
+
+/**  打开操作记录弹窗*/
+const handleLogModal = (row: TableRow) => {
+    if (!row) return
+    // 数据来自表格数据,未重新请求api,深克隆,不然可能会影响表格
+    let rowClone = cloneDeep(row)
+
+    getDateSelect(
+        rowClone.id
+    ).then((res) => {
+        state.dateSelectList = res.data.date_select_list || {}
+        state.loading = false
+        state.logModalConfig.visible = true
+        state.logModalConfig.title = '需求ID:' + rowClone.id + '的操作记录'
+    })
+        .catch(() => {
+            state.loading = false
+        })
+}
+
+/** 关闭操作记录弹窗 */
+const hideLogModal = () => {
+    state.logModalConfig.visible = false
+    state.logModalConfig.title = ''
 }
 
 /**  打开指派弹窗*/

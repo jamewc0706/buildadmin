@@ -10,7 +10,7 @@
                     <el-col class="center">
                         <el-row>
                             <el-col v-for="(val, idx) in item.demand_content" :key="idx">
-                                <span>{{ val }}</span>
+                                <span>{{ val.label }}</span>
                             </el-col>
                         </el-row>
                     </el-col>
@@ -87,6 +87,7 @@ onMounted(() => {
     box-sizing: border-box;
     padding: 5px;
     height: 180px;
+    color: #000;
     width: auto;
 }
 
@@ -99,7 +100,6 @@ onMounted(() => {
 :deep .el-calendar__header {
     justify-content: center;
 }
-
 </style>
   
   

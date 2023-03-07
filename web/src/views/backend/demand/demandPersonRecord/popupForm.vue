@@ -1,6 +1,6 @@
 <template>
     <!-- 对话框表单 -->
-    <el-dialog class="ba-operate-dialog" :close-on-click-modal="false"
+    <el-dialog class="abow_dialog" :close-on-click-modal="false"
         :model-value="['add', 'edit'].includes(baTable.form.operate!)" @close="baTable.toggleForm" width="50%">
         <template #header>
             <div class="title" v-drag="['.ba-operate-dialog', '.el-dialog__header']" v-zoom="'.ba-operate-dialog'">
@@ -13,20 +13,15 @@
                 <el-form v-if="!baTable.form.loading" ref="formRef" @submit.prevent=""
                     @keyup.enter="baTable.onSubmit(formRef)" :model="baTable.form.items" label-position="right"
                     :label-width="baTable.form.labelWidth + 'px'" :rules="rules">
-                    <FormItem :label="t('demand.demandPersonRecord.project_id')" type="string"
-                        v-model="baTable.form.items!.project_id" prop="project_id" :input-attr="{
-                            disabled: true
-                        }"
-                        :placeholder="t('Please select field', { field: t('demand.demandPersonRecord.project_id') })" />
-                    <FormItem :label="t('demand.demandPersonRecord.production_start_date')" type="datetime"
-                        v-model="baTable.form.items!.production_start_date" prop="production_start_date"
-                        :placeholder="t('Please select field', { field: t('demand.demandPersonRecord.production_start_date') })" />
-                    <FormItem :label="t('demand.demandPersonRecord.production_end_date')" type="datetime"
-                        v-model="baTable.form.items!.production_end_date" prop="production_end_date"
-                        :placeholder="t('Please select field', { field: t('demand.demandPersonRecord.production_end_date') })" />
-                    <FormItem :label="t('demand.demandPersonRecord.cost')" type="string" v-model="baTable.form.items!.cost"
-                        prop="cost"
-                        :placeholder="t('Please input field', { field: t('demand.demandPersonRecord.cost') })" />
+                    <FormItem :label="t('demand.demandPersonRecord.status')" type="select"
+                        v-model="baTable.form.items!.status" prop="status" :data="{
+                            content: {
+                                1: '待开始',
+                                2: '进行中',
+                                3: '完成',
+                                4: '延期',
+                            }
+                        }" :placeholder="t('Please input field', { field: t('demand.demandRecord.link') })" />
                 </el-form>
             </div>
         </el-scrollbar>
@@ -55,10 +50,33 @@ const baTable = inject('baTable') as baTableClass
 const { t } = useI18n()
 
 const rules: Partial<Record<string, FormItemRule[]>> = reactive({
-    production_start_date: [buildValidatorData({ name: 'date', title: t('demand.demandPersonRecord.production_start_date') })],
-    production_end_date: [buildValidatorData({ name: 'date', title: t('demand.demandPersonRecord.production_end_date') })],
-    create_time: [buildValidatorData({ name: 'date', title: t('demand.demandPersonRecord.create_time') })],
+    status: [buildValidatorData({ name: 'required', title: t('demand.demandPersonRecord.status') })],
 })
 </script>
 
-<style scoped lang="scss"></style>
+<style scoped lang="scss">
+.abow_dialog {
+    display: flex;
+    justify-content: center;
+    align-items: Center;
+    overflow: hidden;
+
+    .el-dialog {
+        margin: 0 auto !important;
+        height: 90%;
+        overflow: hidden;
+
+        .el-dialog__body {
+            position: absolute;
+            left: 0;
+            top: 54px;
+            bottom: 0;
+            right: 0;
+            padding: 0;
+            z-index: 1;
+            overflow: hidden;
+            overflow-y: auto;
+        }
+    }
+}
+</style>
