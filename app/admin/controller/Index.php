@@ -13,7 +13,7 @@ use app\admin\model\AdminLog;
 class Index extends Backend
 {
     protected $noNeedLogin      = ['logout', 'login'];
-    protected $noNeedPermission = ['index'];
+    protected $noNeedPermission = ['index','getSelect'];
 
     public function index()
     {
@@ -114,5 +114,27 @@ class Index extends Backend
             $this->auth->logout();
             $this->success();
         }
+    }
+
+    // 获取项目以及员工下拉框
+    public function getSelect()
+    {
+        $model = new \app\admin\model\Project;
+        $project_info = $model->order('id desc')->select()->toArray();
+        $project_list = $admin_list = [];
+        foreach ($project_info as $item) {
+            $project_list[$item['id']] = $item['name'];
+        }
+
+        $model = new \app\admin\model\Admin();
+        $admin_info = $model->order('id desc')->select()->toArray();
+        foreach ($admin_info as $item) {
+            $admin_list[$item['id']] = $item['nickname'];
+        }
+
+        $this->success('', [
+            'project_list' => $project_list,
+            'admin_list' => $admin_list,
+        ]);
     }
 }

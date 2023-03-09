@@ -11,15 +11,16 @@
         <Table ref="tableRef" />
 
         <!-- 表单 -->
-        <PopupForm />
+        <PopupForm :adminList="state.adminList" />
     </div>
 </template>
 
 <script setup lang="ts">
-import { ref, provide, onMounted } from 'vue'
+import { ref, provide, onMounted, reactive } from 'vue'
 import baTableClass from '/@/utils/baTable'
 import { defaultOptButtons } from '/@/components/table'
 import { baTableApi } from '/@/api/common'
+import { getSelect } from '/@/api/backend/index'
 import { useI18n } from 'vue-i18n'
 import PopupForm from './popupForm.vue'
 import Table from '/@/components/table/index.vue'
@@ -36,6 +37,7 @@ const baTable = new baTableClass(
             { type: 'selection', align: 'center', operator: false },
             { label: t('project.project.id'), prop: 'id', align: 'center', width: 70, operator: 'RANGE', sortable: 'custom' },
             { label: t('project.project.name'), prop: 'name', width: 120, align: 'center', operatorPlaceholder: t('Fuzzy query'), operator: 'LIKE', sortable: false },
+            { label: t('project.project.group_leader'), prop: 'group_leader_list', width: 120, align: 'center' },
             { label: t('project.project.createtime'), width: 120, prop: 'createtime', align: 'center', render: 'datetime', operator: 'RANGE', sortable: 'custom', timeFormat: 'yyyy-mm-dd hh:MM:ss' },
             { label: t('operate'), align: 'center', width: 100, render: 'buttons', buttons: optButtons, operator: false },
         ],
@@ -45,10 +47,29 @@ const baTable = new baTableClass(
         defaultItems: {},
     }
 )
+const state: {
+    adminList: anyObj,
+    loading: boolean
+} = reactive({
+    adminList: {},
+    loading: true
+})
 
 provide('baTable', baTable)
 
+// 获取下拉框信息
+const getAllSelect = () => {
+    getSelect()
+        .then((res) => {
+            state.adminList = res.data.admin_list || {}
+            state.loading = false
+        })
+        .catch(() => {
+            state.loading = false
+        })
+}
 onMounted(() => {
+    getAllSelect()
     baTable.table.ref = tableRef.value
     baTable.mount()
     baTable.getIndex()?.then(() => {

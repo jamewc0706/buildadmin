@@ -1,34 +1,22 @@
 <template>
     <!-- 对话框表单 -->
-    <el-dialog
-        class="abow_dialog"
-        :close-on-click-modal="false"
-        :model-value="['add', 'edit'].includes(baTable.form.operate!)"
-        @close="baTable.toggleForm"
-        width="50%"
-    >
+    <el-dialog class="abow_dialog" :close-on-click-modal="false"
+        :model-value="['add', 'edit'].includes(baTable.form.operate!)" @close="baTable.toggleForm" width="50%">
         <template #header>
             <div class="title" v-drag="['.ba-operate-dialog', '.el-dialog__header']" v-zoom="'.ba-operate-dialog'">
                 {{ baTable.form.operate ? t(baTable.form.operate) : '' }}
             </div>
         </template>
         <el-scrollbar v-loading="baTable.form.loading" class="ba-table-form-scrollbar">
-            <div
-                class="ba-operate-form"
-                :class="'ba-' + baTable.form.operate + '-form'"
-                :style="'width: calc(100% - ' + baTable.form.labelWidth! / 2 + 'px)'"
-            >
-                <el-form
-                    v-if="!baTable.form.loading"
-                    ref="formRef"
-                    @submit.prevent=""
-                    @keyup.enter="baTable.onSubmit(formRef)"
-                    :model="baTable.form.items"
-                    label-position="right"
-                    :label-width="baTable.form.labelWidth + 'px'"
-                    :rules="rules"
-                >
-                    <FormItem :label="t('project.project.name')" type="string" v-model="baTable.form.items!.name" prop="name" :placeholder="t('Please input field', { field: t('project.project.name') })" />
+            <div class="ba-operate-form" :class="'ba-' + baTable.form.operate + '-form'"
+                :style="'width: calc(100% - ' + baTable.form.labelWidth! / 2 + 'px)'">
+                <el-form v-if="!baTable.form.loading" ref="formRef" @submit.prevent=""
+                    @keyup.enter="baTable.onSubmit(formRef)" :model="baTable.form.items" label-position="right"
+                    :label-width="baTable.form.labelWidth + 'px'" :rules="rules">
+                    <FormItem :label="t('project.project.name')" type="string" v-model="baTable.form.items!.name"
+                        prop="name" :placeholder="t('Please input field', { field: t('project.project.name') })" />
+                    <FormItem :label="t('project.project.group_leader')" type="selects" v-model="baTable.form.items!.group_leader"
+                        prop="group_leader" :data="{ content: adminList }"></FormItem>
                 </el-form>
             </div>
         </el-scrollbar>
@@ -56,21 +44,32 @@ const baTable = inject('baTable') as baTableClass
 
 const { t } = useI18n()
 
+interface Props {
+    adminList: anyObj,
+}
+const props = withDefaults(defineProps<Props>(), {
+    adminList: () => {
+        return {}
+    },
+})
+
 const rules: Partial<Record<string, FormItemRule[]>> = reactive({
     createtime: [buildValidatorData({ name: 'date', title: t('project.project.createtime') })],
 })
 </script>
 
 <style scoped lang="scss">
-    .abow_dialog {
+.abow_dialog {
     display: flex;
     justify-content: center;
     align-items: Center;
     overflow: hidden;
+
     .el-dialog {
         margin: 0 auto !important;
         height: 90%;
         overflow: hidden;
+
         .el-dialog__body {
             position: absolute;
             left: 0;

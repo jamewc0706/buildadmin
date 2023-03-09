@@ -28,3 +28,10 @@ export function logout() {
         },
     })
 }
+
+export function getSelect() {
+    return createAxios({
+        url: controllerUrl + 'getSelect',
+        method: 'get',
+    })
+}
