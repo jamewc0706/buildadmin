@@ -106,21 +106,24 @@ class Project extends Backend
                 }
                 $result = $row->save($data);
 
-                Db::table('project_group') -> where('project_id', $row['id']) -> delete();
-
                 $items = [];
-                foreach($data['group_leader'] as $val){
-                    if($val){
-                        $items[] = [
-                            'project_id' => $row['id'],
-                            'admin_id' => $val,
-                            'operator' => $this->auth->nickname
-                        ];
+                if(isset($data['group_leader']) && !empty($data['group_leader'])){
+                    foreach($data['group_leader'] as $val){
+                        if($val){
+                            $items[] = [
+                                'project_id' => $row['id'],
+                                'admin_id' => $val,
+                                'operator' => $this->auth->nickname
+                            ];
+                        }
+                    }
+                    if($items){
+                    Db::table('project_group') -> where('project_id', $row['id']) -> delete();
+
+                    //批量添加
+                    Db::table('project_group')->insertAll($items);
                     }
                 }
-                //批量添加
-                Db::table('project_group')->insertAll($items);
-
                 Db::commit();
             } catch (ValidateException|PDOException|Exception $e) {
                 Db::rollback();
@@ -176,16 +179,22 @@ class Project extends Backend
                     }
                 }
                 $result = $this->model->save($data);
-                $items = [];
-                foreach($data['group_leader'] as $val){
-                    $items[] = [
-                        'project_id' => $this->model->id,
-                        'admin_id' => $val,
-                        'operator' => $this->auth->nickname
-                    ];
+
+                if(isset($data['group_leader']) && !empty($data['group_leader'])){
+                    $items = [];
+                    foreach($data['group_leader'] as $val){
+                        $items[] = [
+                            'project_id' => $this->model->id,
+                            'admin_id' => $val,
+                            'operator' => $this->auth->nickname
+                        ];
+                    }
+                    if($items){
+                        //批量添加
+                        Db::table('project_group')->insertAll($items);
+                    }
                 }
-                //批量添加
-                Db::table('project_group')->insertAll($items);
+
                 Db::commit();
             } catch (ValidateException|PDOException|Exception $e) {
                 Db::rollback();
@@ -203,4 +212,41 @@ class Project extends Backend
     /**
      * 若需重写查看、编辑、删除等方法，请复制 @see \app\admin\library\traits\Backend 中对应的方法至此进行重写
      */
+
+
+    /**
+     * 删除
+     * @param array $ids
+     */
+    public function del(array $ids = [])
+    {
+        if (!$this->request->isDelete() || !$ids) {
+            $this->error(__('Parameter error'));
+        }
+
+        $dataLimitAdminIds = $this->getDataLimitAdminIds();
+        if ($dataLimitAdminIds) {
+            $this->model->where($this->dataLimitField, 'in', $dataLimitAdminIds);
+        }
+
+        $pk    = $this->model->getPk();
+        $data  = $this->model->where($pk, 'in', $ids)->select();
+        $count = 0;
+        Db::startTrans();
+        try {
+            foreach ($data as $v) {
+                $count += $v->delete();
+                Db::table('project_group') -> where('project_id', $v['id']) -> delete();
+            }
+            Db::commit();
+        } catch (PDOException|Exception $e) {
+            Db::rollback();
+            $this->error($e->getMessage());
+        }
+        if ($count) {
+            $this->success(__('Deleted successfully'));
+        } else {
+            $this->error(__('No rows were deleted'));
+        }
+    }
 }

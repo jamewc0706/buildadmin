@@ -15,8 +15,9 @@
                     :label-width="baTable.form.labelWidth + 'px'" :rules="rules">
                     <FormItem :label="t('project.project.name')" type="string" v-model="baTable.form.items!.name"
                         prop="name" :placeholder="t('Please input field', { field: t('project.project.name') })" />
-                    <FormItem :label="t('project.project.group_leader')" type="selects" v-model="baTable.form.items!.group_leader"
-                        prop="group_leader" :data="{ content: adminList }"></FormItem>
+                    <FormItem :label="t('project.project.group_leader')" type="selects"
+                        v-model="baTable.form.items!.group_leader" prop="group_leader" :data="{ content: adminList }">
+                    </FormItem>
                 </el-form>
             </div>
         </el-scrollbar>
@@ -54,7 +55,7 @@ const props = withDefaults(defineProps<Props>(), {
 })
 
 const rules: Partial<Record<string, FormItemRule[]>> = reactive({
-    createtime: [buildValidatorData({ name: 'date', title: t('project.project.createtime') })],
+    name: [buildValidatorData({ name: 'required', title: t('project.project.name') })],
 })
 </script>
 
