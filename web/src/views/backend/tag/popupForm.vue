@@ -1,7 +1,7 @@
 <template>
     <!-- 对话框表单 -->
     <el-dialog class="abow_dialog" :close-on-click-modal="false"
-        :model-value="['add', 'edit'].includes(baTable.form.operate!)" @close="baTable.toggleForm" width="30%">
+        :model-value="['add', 'edit'].includes(baTable.form.operate!)" @close="baTable.toggleForm" width="50%">
         <template #header>
             <div class="title" v-drag="['.ba-operate-dialog', '.el-dialog__header']" v-zoom="'.ba-operate-dialog'">
                 {{ baTable.form.operate ? t(baTable.form.operate) : '' }}
@@ -13,15 +13,16 @@
                 <el-form v-if="!baTable.form.loading" ref="formRef" @submit.prevent=""
                     @keyup.enter="baTable.onSubmit(formRef)" :model="baTable.form.items" label-position="right"
                     :label-width="baTable.form.labelWidth + 'px'" :rules="rules">
-                    <FormItem :label="t('demand.demandPersonRecord.status')" type="select"
-                        v-model="baTable.form.items!.status" prop="status" :data="{
-                            content: {
-                                1: '待开始',
-                                2: '进行中',
-                                3: '完成',
-                                4: '延期',
-                            }
-                        }" :placeholder="t('Please input field', { field: t('demand.demandRecord.link') })" />
+                    <FormItem :label="t('tag.tag.admin_name')" type="select" v-model="baTable.form.items!.admin_id"
+                        prop="admin_id" :data="{ content: adminList }"
+                        :placeholder="t('Please select field', { field: t('tag.tag.admin_name') })" />
+                    <FormItem :label="t('tag.tag.tag')" type="select" v-model="baTable.form.items!.tag" prop="tag" :data="{
+                        content: {
+                            1: '外延固定',
+                            2: '外延灵活',
+                            3: '非外延灵活',
+                        }
+                    }" :placeholder="t('Please input field', { field: t('tag.tag.tag') })" />
                 </el-form>
             </div>
         </el-scrollbar>
@@ -49,8 +50,19 @@ const baTable = inject('baTable') as baTableClass
 
 const { t } = useI18n()
 
+interface Props {
+    adminList: anyObj,
+}
+
+const props = withDefaults(defineProps<Props>(), {
+    adminList: () => {
+        return {}
+    },
+})
+
 const rules: Partial<Record<string, FormItemRule[]>> = reactive({
-    status: [buildValidatorData({ name: 'required', title: t('demand.demandPersonRecord.status') })],
+    admin_id: [buildValidatorData({ name: 'required', title: t('tag.tag.admin_name') })],
+    tag: [buildValidatorData({ name: 'required', title: t('tag.tag.tag') })],
 })
 </script>
 

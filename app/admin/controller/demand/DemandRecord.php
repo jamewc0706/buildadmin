@@ -320,6 +320,12 @@ class DemandRecord extends Backend
         $extra_content = trim($data['extra_content']) ?? '';
         $mark_arr = $info = $items = [];
 
+        $tag_info = Db::table('admin_tag')->where('admin_id',$producer_id)->find();
+
+        if(empty($tag_info)){
+            $this->error(__('当前制作人员无标签,无法指派'));
+        }
+
         if (!empty($extra_content)) {
             // 中文逗号处理
             $extra_content = trim($extra_content);
@@ -371,7 +377,8 @@ class DemandRecord extends Backend
                 'status' => 1,
                 'type' => $type,
                 'admin_id' => $this->auth->id,
-                'operator' => $this->auth->username
+                'operator' => $this->auth->username,
+                'tag' => $tag_info['tag']
             ];
 
             $items[] = $item;

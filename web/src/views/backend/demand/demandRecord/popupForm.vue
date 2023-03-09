@@ -16,9 +16,13 @@
                     <FormItem :label="t('demand.demandRecord.project_id')" type="select"
                         v-model="baTable.form.items!.project_id" prop="project_id" :data="{ content: projectList }"
                         :placeholder="t('Please select field', { field: t('demand.demandRecord.project_id') })" />
-                    <FormItem :label="t('demand.demandRecord.department_id')" type="select"
-                        v-model="baTable.form.items!.department_id" prop="department_id" :data="{ content: {} }"
-                        :placeholder="t('Please select field', { field: t('demand.demandRecord.department_id') })" />
+                    <FormItem :label="t('demand.demandRecord.department')" type="select"
+                        v-model="baTable.form.items!.department" prop="department" :data="{
+                            content: {
+                                'CCC': 'CCC',
+                                'EBF': 'EBF',
+                            }
+                        }" :placeholder="t('Please select field', { field: t('demand.demandRecord.department') })" />
                     <FormItem :label="t('demand.demandRecord.link')" type="select" v-model="baTable.form.items!.link"
                         prop="link" :data="{
                             content: {
@@ -91,6 +95,7 @@ const props = withDefaults(defineProps<Props>(), {
 const rules: Partial<Record<string, FormItemRule[]>> = reactive({
     project_id: [buildValidatorData({ name: 'required', title: t('demand.demandRecord.project_id') })],
     link: [buildValidatorData({ name: 'required', title: t('demand.demandRecord.link') })],
+    department: [buildValidatorData({ name: 'required', title: t('demand.demandRecord.department') })],
     send_bag_date: [buildValidatorData({ name: 'date', title: t('demand.demandRecord.send_bag_date') })],
     receive_bag_date: [buildValidatorData({ name: 'date', title: t('demand.demandRecord.receive_bag_date') })],
     production_start_date: [buildValidatorData({ name: 'date', title: t('demand.demandRecord.production_start_date') })],

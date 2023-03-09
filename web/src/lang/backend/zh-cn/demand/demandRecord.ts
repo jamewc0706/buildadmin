@@ -17,6 +17,6 @@ export default {
     contact_person: '网易接口人',
     create_time: '创建时间',
     balance: '余下制作人天',
-    department_id: '二级艺设部门',
+    department: '二级艺设部门',
     'quick Search Fields': '序号',
 }

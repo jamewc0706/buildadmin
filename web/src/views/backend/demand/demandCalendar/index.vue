@@ -3,14 +3,16 @@
         <template #date-cell="{ data }">
             <el-row :class="data.isSelected ? 'is-selected' : 'sds'">
                 {{ data.day.split('-').slice(1).join('-') }}
-                <!-- {{ data.isSelected ? '✔️' : '' }} -->
             </el-row>
             <div v-for="(item, index) in textContent(data.day)" :key="index">
                 <e-row>
                     <el-col class="center">
                         <el-row>
-                            <el-col v-for="(val, idx) in item.demand_content" :key="idx">
-                                <span>{{ val.label }}</span>
+                            <el-col style="margin-top: 5px;" v-for="(val, idx) in item.demand_content" :key="idx">
+                                <span style="color: black;" v-if="val.status == 1">{{ val.label }}</span>
+                                <span style="color: red;" v-else-if="val.status == 2">{{ val.label }}</span>
+                                <span style="color: blue;" v-else-if="val.status == 3">{{ val.label }}</span>
+                                <span style="color: blue;" v-else-if="val.status == 4">{{ val.label }}</span>
                             </el-col>
                         </el-row>
                     </el-col>

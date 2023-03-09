@@ -19,7 +19,7 @@ return [
     // 表格拖拽排序时,两个权重相等则自动重新整理;控制器类中也有此项（作为单控制器自定义配置）
     'auto_sort_eq_weight'  => false,
     // 开启前台会员中心
-    'open_member_center'   => true,
+    'open_member_center'   => false,
     // Token 配置
     'token'                => [
         // 默认驱动方式

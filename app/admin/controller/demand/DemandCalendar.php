@@ -33,9 +33,12 @@ class DemandCalendar extends Backend
         $info = Db::name('person_demand_schedule')->where('producer_id',$this->auth->id)->select();
         $demand_info = Db::name('demand_record')->select()->toArray();
         $demand_info = array_column($demand_info,null,'id');
+        $person_demand_info = Db::name('demand_person_record')->select()->toArray();
+        $person_demand_info = array_column($person_demand_info,null,'demand_id');
         foreach ($info as $item) {
             $demand_content[$item['date']][] =  [
                 'label' => isset($demand_info[$item['demand_id']]) ? $demand_info[$item['demand_id']]['demand_name'] . "-人天:{$item['cost']}" : '未知需求名',
+                'status' => isset($person_demand_info[$item['demand_id']]) ? $person_demand_info[$item['demand_id']]['status'] : 0,
             ];
         }
 

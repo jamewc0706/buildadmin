@@ -159,7 +159,12 @@ const baTable = new baTableClass(
             { type: 'selection', align: 'center', operator: false },
             { label: t('demand.demandRecord.id'), prop: 'id', align: 'center', width: 100, operator: 'RANGE', sortable: 'custom' },
             { label: t('demand.demandRecord.project_id'), prop: 'project_name', width: 140, align: 'center', render: 'tags', operator: false, sortable: false, replaceValue: {} },
-            { label: t('demand.demandRecord.department_id'), prop: 'department_id', width: 140, align: 'center', render: 'tags', operator: false, sortable: false, replaceValue: {} },
+            {
+                label: t('demand.demandRecord.department'), prop: 'department', width: 140, align: 'center', render: 'tags', operator: false, sortable: false, replaceValue: {
+                    'CCC': 'CCC',
+                    'EBF': 'EBF',
+                }
+            },
             {
                 label: t('demand.demandRecord.link'), render: 'tag', prop: 'link', align: 'center', width: 70, operatorPlaceholder: t('Fuzzy query'), operator: '=', sortable: false, replaceValue: {
                     1: '界面',
