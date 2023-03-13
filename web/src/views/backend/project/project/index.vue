@@ -3,7 +3,7 @@
         <el-alert class="ba-table-alert" v-if="baTable.table.remark" :title="baTable.table.remark" type="info" show-icon />
 
         <!-- 表格顶部菜单 -->
-        <TableHeader :buttons="['refresh', 'add', 'edit', 'delete', 'comSearch', 'quickSearch', 'columnDisplay']"
+        <TableHeader :buttons="['refresh', 'add']"
             :quick-search-placeholder="t('quick Search Placeholder', { fields: t('project.project.quick Search Fields') })" />
 
         <!-- 表格 -->
@@ -35,9 +35,9 @@ const baTable = new baTableClass(
         pk: 'id',
         column: [
             { type: 'selection', align: 'center', operator: false },
-            { label: t('project.project.id'), prop: 'id', align: 'center', width: 70, operator: 'RANGE', sortable: 'custom' },
+            { label: t('project.project.id'), prop: 'id', align: 'center', width: 100, operator: '=', sortable: 'custom' },
             { label: t('project.project.name'), prop: 'name', width: 120, align: 'center', operatorPlaceholder: t('Fuzzy query'), operator: 'LIKE', sortable: false },
-            { label: t('project.project.group_leader'), prop: 'group_leader_list', width: 120, align: 'center' },
+            { label: t('project.project.group_leader'), prop: 'group_leader_list', width: 160, align: 'center' },
             { label: t('project.project.createtime'), width: 120, prop: 'createtime', align: 'center', render: 'datetime', operator: 'RANGE', sortable: 'custom', timeFormat: 'yyyy-mm-dd hh:MM:ss' },
             { label: t('operate'), align: 'center', width: 100, render: 'buttons', buttons: optButtons, operator: false },
         ],

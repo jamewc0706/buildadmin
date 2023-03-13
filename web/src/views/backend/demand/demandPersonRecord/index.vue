@@ -3,7 +3,7 @@
         <el-alert class="ba-table-alert" v-if="baTable.table.remark" :title="baTable.table.remark" type="info" show-icon />
 
         <!-- 表格顶部菜单 -->
-        <TableHeader :buttons="['refresh', 'comSearch', 'quickSearch', 'columnDisplay']"
+        <TableHeader :buttons="['refresh', 'comSearch', 'quickSearch']"
             :quick-search-placeholder="t('quick Search Placeholder', { fields: t('demand.demandPersonRecord.quick Search Fields') })" />
 
         <!-- 表格 -->

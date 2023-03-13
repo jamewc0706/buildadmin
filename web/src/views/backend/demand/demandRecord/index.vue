@@ -3,7 +3,7 @@
         <el-alert class="ba-table-alert" v-if="baTable.table.remark" :title="baTable.table.remark" type="info" show-icon />
 
         <!-- 表格顶部菜单 -->
-        <TableHeader :buttons="['refresh', 'add', 'edit', 'delete', 'comSearch', 'quickSearch', 'columnDisplay']"
+        <TableHeader :buttons="['refresh', 'add', 'comSearch', 'quickSearch', 'columnDisplay']"
             :quick-search-placeholder="t('quick Search Placeholder', { fields: t('demand.demandRecord.quick Search Fields') })" />
 
         <!-- 表格 -->
@@ -157,7 +157,7 @@ const baTable = new baTableClass(
         pk: 'id',
         column: [
             { type: 'selection', align: 'center', operator: false },
-            { label: t('demand.demandRecord.id'), prop: 'id', align: 'center', width: 100, operator: 'RANGE', sortable: 'custom' },
+            { label: t('demand.demandRecord.id'), prop: 'id', align: 'center', width: 100, operator: '=', sortable: 'custom' },
             { label: t('demand.demandRecord.project_id'), prop: 'project_name', width: 140, align: 'center', render: 'tags', operator: false, sortable: false, replaceValue: {} },
             {
                 label: t('demand.demandRecord.department'), prop: 'department', width: 140, align: 'center', render: 'tags', operator: false, sortable: false, replaceValue: {
@@ -166,28 +166,28 @@ const baTable = new baTableClass(
                 }
             },
             {
-                label: t('demand.demandRecord.link'), render: 'tag', prop: 'link', align: 'center', width: 70, operatorPlaceholder: t('Fuzzy query'), operator: '=', sortable: false, replaceValue: {
+                label: t('demand.demandRecord.link'), render: 'tag', prop: 'link', align: 'center', width: 70, operator: '=', sortable: false, replaceValue: {
                     1: '界面',
                     2: '交互',
                     3: '拼接',
                     4: '动效',
                 }
             },
-            { label: t('demand.demandRecord.asset_name'), prop: 'asset_name', width: 90, align: 'center', operatorPlaceholder: t('Fuzzy query'), operator: 'LIKE', sortable: false },
-            { label: t('demand.demandRecord.demand_name'), prop: 'demand_name', width: 90, align: 'center', operatorPlaceholder: t('Fuzzy query'), operator: 'LIKE', sortable: false },
+            { label: t('demand.demandRecord.asset_name'), prop: 'asset_name', width: 90, align: 'center', operator: 'LIKE', sortable: false },
+            { label: t('demand.demandRecord.demand_name'), prop: 'demand_name', width: 90, align: 'center', operator: 'LIKE', sortable: false },
             {
-                label: t('demand.demandRecord.status'), render: 'tag', prop: 'status', align: 'center', width: 70, operator: 'RANGE', sortable: false, replaceValue: {
+                label: t('demand.demandRecord.status'), render: 'tag', prop: 'status', align: 'center', width: 70, operator: '=', sortable: false, replaceValue: {
                     1: '待开始',
                     2: '已分配',
                     3: '结束',
                 }
             },
-            { label: t('demand.demandRecord.send_bag_date'), prop: 'send_bag_date', align: 'center', operator: '=', sortable: 'custom', width: 160 },
-            { label: t('demand.demandRecord.receive_bag_date'), prop: 'receive_bag_date', align: 'center', operator: '=', sortable: 'custom', width: 160 },
-            { label: t('demand.demandRecord.production_start_date'), prop: 'production_start_date', align: 'center', operator: '=', sortable: 'custom', width: 160 },
-            { label: t('demand.demandRecord.production_end_date'), prop: 'production_end_date', align: 'center', operator: '=', sortable: 'custom', width: 160 },
-            { label: t('demand.demandRecord.cost'), prop: 'cost', align: 'center', width: 120, operatorPlaceholder: t('Fuzzy query'), operator: 'LIKE', sortable: false },
-            { label: t('demand.demandRecord.contact_person'), prop: 'contact_person', width: 120, align: 'center', operatorPlaceholder: t('Fuzzy query'), operator: 'LIKE', sortable: false },
+            { label: t('demand.demandRecord.send_bag_date'), prop: 'send_bag_date', align: 'center', render: 'datetime', operator: 'RANGE', sortable: 'custom', width: 160, timeFormat: 'yyyy-mm-dd hh:MM:ss' },
+            { label: t('demand.demandRecord.receive_bag_date'), prop: 'receive_bag_date', align: 'center', render: 'datetime', operator: 'RANGE', sortable: 'custom', width: 160, timeFormat: 'yyyy-mm-dd hh:MM:ss' },
+            { label: t('demand.demandRecord.production_start_date'), prop: 'production_start_date', align: 'center', render: 'datetime', operator: 'RANGE', sortable: 'custom', width: 160, timeFormat: 'yyyy-mm-dd hh:MM:ss' },
+            { label: t('demand.demandRecord.production_end_date'), prop: 'production_end_date', align: 'center', render: 'datetime', operator: 'RANGE', sortable: 'custom', width: 160, timeFormat: 'yyyy-mm-dd hh:MM:ss' },
+            { label: t('demand.demandRecord.cost'), prop: 'cost', align: 'center', width: 120, operator: '=', sortable: false },
+            { label: t('demand.demandRecord.contact_person'), prop: 'contact_person', width: 120, align: 'center', operator: 'LIKE', sortable: false },
             { label: t('demand.demandRecord.create_time'), prop: 'create_time', align: 'center', render: 'datetime', operator: 'RANGE', sortable: 'custom', width: 160, timeFormat: 'yyyy-mm-dd hh:MM:ss' },
             { label: t('operate'), align: 'center', width: 160, render: 'buttons', buttons: optButtons, operator: false },
         ],
