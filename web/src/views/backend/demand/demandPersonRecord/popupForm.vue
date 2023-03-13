@@ -18,8 +18,11 @@
                             content: {
                                 1: '待开始',
                                 2: '进行中',
-                                3: '完成',
-                                4: '延期',
+                                3: '已完成',
+                                4: '请假',
+                                5: '暂停中',
+                                6: '已回收',
+                                7: '延期',
                             }
                         }" :placeholder="t('Please input field', { field: t('demand.demandRecord.link') })" />
                 </el-form>
