@@ -34,10 +34,10 @@ const baTable = new baTableClass(
         pk: 'id',
         column: [
             { type: 'selection', align: 'center', operator: false },
-            { label: t('demand.demandPersonRecord.id'), prop: 'id', align: 'center', width: 70, operator: 'RANGE', sortable: 'custom' },
-            { label: t('demand.demandPersonRecord.demand_id'), prop: 'demand_name', align: 'center', operatorPlaceholder: t('Fuzzy query'), operator: 'LIKE' },
+            { label: t('demand.demandPersonRecord.id'), prop: 'id', align: 'center', width: 100, operator: '=', sortable: 'custom' },
+            { label: t('demand.demandPersonRecord.demand_id'), prop: 'demand_name', width: 160, align: 'center', operatorPlaceholder: t('Fuzzy query'), operator: 'LIKE' },
             {
-                label: t('demand.demandPersonRecord.status'), render: 'tag', prop: 'status', align: 'center', width: 70, operator: 'RANGE', sortable: false, replaceValue: {
+                label: t('demand.demandPersonRecord.status'), render: 'tag', prop: 'status', align: 'center', width: 100, operator: '=', sortable: false, replaceValue: {
                     1: '待开始',
                     2: '进行中',
                     3: '完成',
