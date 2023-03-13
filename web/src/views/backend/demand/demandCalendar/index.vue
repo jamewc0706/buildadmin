@@ -9,7 +9,7 @@
                     <el-col class="center">
                         <el-row>
                             <el-col v-for="(val, idx) in item.demand_content" :key="idx">
-                                <el-tag :key="idx" :type="val.type" class="mx-1 tag-w center" effect="dark">
+                                <el-tag :key="idx" :type="val.type" :class="val.class" effect="dark">
                                     {{ val.desc }}
                                 </el-tag>
                                 <el-ul v-for="(value, tag) in val.demand" class="text">
@@ -34,50 +34,15 @@ const state = reactive({
     loading: true,
     //测试数据
     calendarData: [
-        {
-            "day": '2023-03-07',
-            "demand_content": [
-                {
-                    "type": "info",
-                    "desc": '待开始',
-                    "demand": [
-                        '需求1',
-                        '需求2',
-                    ]
-                },
-                {
-                    "type": "",
-                    "desc": '进行中',
-                    "demand": [
-                        '需求1',
-                        '需求2',
-                    ]
-                },
-                {
-                    "type": "success",
-                    "desc": '已完成',
-                    "demand": [
-                        '需求1',
-                        '需求2',
-                    ]
-                }, {
-                    "type": "danger",
-                    "desc": '已延期',
-                    "demand": [
-                        '需求1',
-                        '需求2',
-                    ]
-                }
-            ]
-        }
     ],
+    value: []
 });
 
 // 获取下拉框信息
 const getIndex = () => {
     getPersonDemand()
         .then((res) => {
-            // state.calendarData = res.data.calendar_data
+            state.calendarData = res.data.calendar_data
             state.loading = false
         })
         .catch(() => {
@@ -143,12 +108,74 @@ onMounted(() => {
     justify-content: center;
 }
 
-.tag-w {
+.tag-1 {
     width: 80px;
     margin-bottom: 5px;
     margin-top: 5px;
     justify-content: center;
     align-items: center;
+    background-color: #52aeef;
+    border-color: #52aeef;
+}
+
+.tag-2 {
+    width: 80px;
+    margin-bottom: 5px;
+    margin-top: 5px;
+    justify-content: center;
+    align-items: center;
+    background-color: #fa8002;
+    border-color: #fa8002;
+}
+
+.tag-3 {
+    width: 80px;
+    margin-bottom: 5px;
+    margin-top: 5px;
+    justify-content: center;
+    align-items: center;
+    background-color: #32cd33;
+    border-color: #32cd33;
+}
+
+.tag-4 {
+    width: 80px;
+    margin-bottom: 5px;
+    margin-top: 5px;
+    justify-content: center;
+    align-items: center;
+    background-color: #da70d5;
+    border-color: #da70d5;
+}
+
+.tag-5 {
+    width: 80px;
+    margin-bottom: 5px;
+    margin-top: 5px;
+    justify-content: center;
+    align-items: center;
+    background-color: #818a87;
+    border-color: #818a87;
+}
+
+.tag-6 {
+    width: 80px;
+    margin-bottom: 5px;
+    margin-top: 5px;
+    justify-content: center;
+    align-items: center;
+    background-color: #6b5acd;
+    border-color: #6b5acd;
+}
+
+.tag-7 {
+    width: 80px;
+    margin-bottom: 5px;
+    margin-top: 5px;
+    justify-content: center;
+    align-items: center;
+    background-color: #fe0000;
+    border-color: #fe0000;
 }
 
 .text {

@@ -14,7 +14,10 @@
                     @keyup.enter="baTable.onSubmit(formRef)" :model="baTable.form.items" label-position="right"
                     :label-width="baTable.form.labelWidth + 'px'" :rules="rules">
                     <FormItem :label="t('project.project.name')" type="string" v-model="baTable.form.items!.name"
-                        prop="name" :placeholder="t('Please input field', { field: t('project.project.name') })" />
+                        prop="name" :placeholder="t('Please input field', { field: t('project.project.name') })"
+                        :input-attr="{
+                            disabled: baTable.form.operate == 'edit' ? true : false
+                        }" />
                     <FormItem :label="t('project.project.group_leader')" type="selects"
                         v-model="baTable.form.items!.group_leader" prop="group_leader" :data="{ content: adminList }">
                     </FormItem>
@@ -53,6 +56,27 @@ const props = withDefaults(defineProps<Props>(), {
         return {}
     },
 })
+
+interface Option {
+    key: number
+    label: string
+    disabled: boolean
+}
+
+const generateData = () => {
+    const data: Option[] = []
+    for (let i = 1; i <= 15; i++) {
+        data.push({
+            key: i,
+            label: `Option ${i}`,
+            disabled: i % 4 === 0,
+        })
+    }
+    return data
+}
+
+const data = ref<Option[]>(generateData())
+const value = ref([])
 
 const rules: Partial<Record<string, FormItemRule[]>> = reactive({
     name: [buildValidatorData({ name: 'required', title: t('project.project.name') })],

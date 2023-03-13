@@ -36,6 +36,8 @@ module.exports = {
                 varsIgnorePattern: '^_',
             },
         ],
+        'vue/singleline-html-element-content-newline': 'off',
+        'vue/multiline-html-element-content-newline': 'off',
         'vue/v-on-event-hyphenation': 'off',
         'vue/custom-event-name-casing': 'off',
         'vue/component-definition-name-casing': 'off',

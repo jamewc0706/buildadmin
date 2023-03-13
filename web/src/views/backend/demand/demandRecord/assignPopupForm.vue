@@ -10,13 +10,13 @@
         <el-scrollbar v-loading="baTable.form.loading" class="ba-table-form-scrollbar">
             <div class="ba-operate-form" :class="'ba-' + baTable.form.operate + '-form'"
                 :style="'width: calc(100% - ' + baTable.form.labelWidth! / 2 + 'px)'">
-                <el-form ref="formRef" @submit.prevent="" :model="assignData"
-                    label-position="right" :label-width="baTable.form.labelWidth + 'px'" :rules="rules">
+                <el-form ref="formRef" @submit.prevent="" :model="assignData" label-position="right"
+                    :label-width="baTable.form.labelWidth + 'px'" :rules="rules">
                     <FormItem :label="t('demand.demandRecord.producer_id')" type="select" v-model="assignData.producer_id"
                         prop="producer_id" :data="{ content: adminList }"
                         :placeholder="t('Please select field', { field: t('demand.demandRecord.producer_id') })" />
                     <FormItem :label="t('demand.demandRecord.date_list')" type="selects" prop="date_list"
-                        v-model="assignData.date_list" :data="{
+                        v-model="assignData!.date_list" :data="{
                             content: dateSelectList
                         }" />
                     <FormItem :label="t('demand.demandRecord.extra_content')" prop="extra_content" type="textarea"
@@ -36,7 +36,7 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref, inject, onMounted } from 'vue'
+import { reactive, ref, inject } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type baTableClass from '/@/utils/baTable'
 import FormItem from '/@/components/formItem/index.vue'
